@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3,
+    "name": "RephraseMe",
+    "version": "0.0.1",
+    "description": "this extension rephrases what ever you give it to it",
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "RephraseMe"
+    },
+    "content_scripts": [
+        {
+            "js": ["content-script.js"],
+            "matches": ["<all_urls>"]
+        }
+    ]
+}

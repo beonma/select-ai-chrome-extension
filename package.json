@@ -1,0 +1,18 @@
+{
+  "name": "rephrase-me-extension",
+  "version": "0.0.1",
+  "main": "none",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "chrome",
+    "extension",
+    "rephrase",
+    "ai",
+    "web"
+  ],
+  "author": "beonma",
+  "license": "ISC",
+  "description": ""
+}
