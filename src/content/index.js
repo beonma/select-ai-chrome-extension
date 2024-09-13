@@ -1,8 +1,12 @@
+import * as styles from "./index.module.css";
+
+console.log(styles);
+
 const selection = getSelection();
 let prevSelectedText = "";
 
 const html = `
-<div class="i1U2I__container">
+<div class="${styles.container}">
     <button>rephrase</button>
     <select id="rephrase-tone">
         <option value="formal">formal</option>
@@ -15,7 +19,9 @@ const html = `
 
 document.querySelector("body").insertAdjacentHTML("afterbegin", html);
 
-const htmlNode = document.querySelector(".i1U2I__container");
+const htmlNode = document.querySelector(`.${styles.container}`);
+console.log("parent element", htmlNode);
+
 const rephraseBtn = htmlNode.querySelector("button");
 const rephraseSelect = htmlNode.querySelector("select");
 

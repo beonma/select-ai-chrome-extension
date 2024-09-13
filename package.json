@@ -1,18 +1,26 @@
 {
-  "name": "rephrase-me-extension",
-  "version": "0.0.1",
-  "main": "none",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "chrome",
-    "extension",
-    "rephrase",
-    "ai",
-    "web"
-  ],
-  "author": "beonma",
-  "license": "ISC",
-  "description": ""
+    "name": "rephrase-me-extension",
+    "version": "0.0.1",
+    "main": "none",
+    "scripts": {
+        "start": "webpack --watch",
+        "build": "webpack --mode production"
+    },
+    "keywords": [
+        "chrome",
+        "extension",
+        "rephrase",
+        "ai",
+        "web"
+    ],
+    "author": "beonma",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "copy-webpack-plugin": "^12.0.2",
+        "css-loader": "^7.1.2",
+        "mini-css-extract-plugin": "^2.9.1",
+        "webpack": "^5.94.0",
+        "webpack-cli": "^5.1.4"
+    }
 }
