@@ -8,7 +8,7 @@ const Dotenv = require("dotenv-webpack");
 module.exports = {
     mode: "development",
     entry: {
-        content: "./src/content/index.js",
+        content: "./src/content/index.ts",
     },
     output: {
         path: path.resolve(__dirname, "dist"),
@@ -16,8 +16,10 @@ module.exports = {
     },
     devtool: "cheap-source-map",
     target: ["web", "es5"],
+    resolve: { extensions: [".ts", ".tsx"] },
     module: {
         rules: [
+            { test: /\.tsx?$/, use: "ts-loader", exclude: /node_modules/ },
             {
                 test: /\.css$/,
                 use: [
