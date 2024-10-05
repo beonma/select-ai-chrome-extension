@@ -1,16 +1,30 @@
 import { rephrase } from "../utils/ai-script";
 import * as styles from "./index.module.css";
+import RephraseSVG from "../assets/svg/rephrase.svg";
+import CaretSVG from "../assets/svg/caret.svg";
+import SpellingSVG from "../assets/svg/spelling.svg";
 
 const selection = getSelection();
 let prevSelectedText = "";
+
 const rephraseTones = ["formal", "convince", "normal", "angry"];
 
 const html = `
 <div class="${styles.container}">
-    <button class="${styles.rephrase_btn}">rephrase</button>
+    <button class="${styles.btn}">rephrase
+    ${RephraseSVG}
+    </button>
+    <div class="${styles.select__container}">
     <select id="rephrase-tone">
         ${rephraseTones.map(tone => `<option value="${tone}">${tone}</option>`).join("")}
     </select>
+    <span class="${styles.select__caret}">
+    ${CaretSVG}
+    </span>
+    </div>
+    <button class="${styles.btn}">fix autograph
+    ${SpellingSVG}
+    </button>
 </div>
 `;
 

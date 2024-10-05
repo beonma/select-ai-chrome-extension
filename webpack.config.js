@@ -20,6 +20,7 @@ module.exports = {
     module: {
         rules: [
             { test: /\.tsx?$/, use: "ts-loader", exclude: /node_modules/ },
+            { test: /\.svg$/, use: "svg-inline-loader" },
             {
                 test: /\.css$/,
                 use: [
