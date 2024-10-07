@@ -5,57 +5,81 @@ import CaretSVG from "../assets/svg/caret.svg";
 import SpellingSVG from "../assets/svg/spelling.svg";
 
 const selection = getSelection();
-let prevSelectedText = "";
+let selectionTimeout: ReturnType<typeof setTimeout>;
+let clonedRange: Range;
 
 const rephraseTones = ["formal", "convince", "normal", "angry"];
 
 const html = `
 <div class="${styles.container}">
-    <button class="${styles.btn}">rephrase
-    ${RephraseSVG}
-    </button>
-    <div class="${styles.select__container}">
-    <select id="rephrase-tone">
-        ${rephraseTones.map(tone => `<option value="${tone}">${tone}</option>`).join("")}
-    </select>
-    <span class="${styles.select__caret}">
-    ${CaretSVG}
-    </span>
+    <div class="${styles.toolbar}">
+        <button class="${styles.btn}">rephrase
+            ${RephraseSVG}
+        </button>
+        <div class="${styles.select__container}">
+            <select id="rephrase-tone">
+                ${rephraseTones.map(tone => `<option value="${tone}">${tone}</option>`).join("")}
+            </select>
+            <span class="${styles.select__caret}">
+                ${CaretSVG}
+            </span>
+        </div>
+        <button class="${styles.btn}">fix spelling
+            ${SpellingSVG}
+        </button>
     </div>
-    <button class="${styles.btn}">fix autograph
-    ${SpellingSVG}
-    </button>
+    <div class="${styles.content}">
+        <p></p>
+        <div class="${styles.action__container}">
+            <button id="accept" class="${styles.btn}">accept</button>
+            <button id="discard" class="${styles.btn}">discard</button>
+            <button id="try-again" class="${styles.btn}">try again</button>
+        </div>
+    </div>
 </div>
 `;
 
 document.querySelector("body")?.insertAdjacentHTML("afterbegin", html);
 
-const htmlNode = document.querySelector(`.${styles.container}`) as HTMLElement;
-console.log("parent element", htmlNode);
+const htmlNode = <HTMLElement>document.querySelector(`.${styles.container}`);
 
 const rephraseBtn = <HTMLButtonElement>htmlNode.querySelector("button");
 const rephraseSelect = <HTMLSelectElement>htmlNode.querySelector("select");
+const content = <HTMLDivElement>htmlNode.querySelector(`.${styles.content}`);
+const contentParagraph = <HTMLParagraphElement>content.querySelector("p");
 
-document.addEventListener("mouseup", () => {
+// const acceptButton = <HTMLButtonElement>content.querySelector("#accept");
+// const discardButton = <HTMLButtonElement>content.querySelector("#discard");
+
+document.addEventListener("click", event => {
+    // COMMENT typescript forcing as Node in event.target
+    if (htmlNode.contains(event.target as Node) || selection?.type === "Range") {
+        return;
+    }
+
+    htmlNode.style.display = "none";
+    content.style.display = "none";
+    contentParagraph.innerHTML = "";
+});
+
+document.addEventListener("selectionchange", () => {
+    clearTimeout(selectionTimeout);
+
     if (selection?.type !== "Range") {
-        console.log("nothing to select");
-        htmlNode.style.display = "none";
         return;
     }
 
-    const range = selection.getRangeAt(0);
+    selectionTimeout = setTimeout(() => {
+        const range = selection.getRangeAt(0);
+        const { bottom: offsetY, left: offsetX } = range.getBoundingClientRect();
 
-    if (prevSelectedText === range.toString()) {
-        return;
-    }
+        htmlNode.style.display = "block";
+        htmlNode.style.top = `${offsetY + window.scrollY + 10}px`;
+        htmlNode.style.left = `${offsetX}px`;
 
-    const { bottom: offsetY, left: offsetX } = range.getBoundingClientRect();
-
-    htmlNode.style.display = "flex";
-    htmlNode.style.top = `${offsetY + window.scrollY + 10}px`;
-    htmlNode.style.left = `${offsetX}px`;
-
-    prevSelectedText = range.toString();
+        clonedRange = range.cloneRange();
+        console.log(clonedRange);
+    }, 500);
 });
 
 rephraseBtn?.addEventListener("click", async () => {
@@ -63,21 +87,21 @@ rephraseBtn?.addEventListener("click", async () => {
         return;
     }
 
-    const parentElement = selection.anchorNode?.parentElement;
-    const result = await rephrase(selection.toString(), rephraseSelect.value);
-    // htmlNode.style.display = "none";
+    try {
+        const result = await rephrase(clonedRange.toString(), rephraseSelect.value);
 
-    let textString = "";
-    for await (const chunk of result.stream) {
-        const text = chunk.text();
-        console.log(text);
-        textString += text;
-        // range.insertNode(document.createTextNode(textString));
+        content.style.display = "block";
+        contentParagraph.innerHTML = "";
 
-        if (parentElement) {
-            parentElement.textContent = textString;
+        for await (const chunk of result.stream) {
+            const text = chunk.text();
+
+            const spanElement = document.createElement("span");
+            spanElement.textContent = text;
+            contentParagraph.insertAdjacentElement("beforeend", spanElement);
         }
+    } catch (e) {
+        content.style.display = "block";
+        content.textContent = "Oops ! something went wrong.";
     }
-
-    // selection.removeAllRanges();
 });
