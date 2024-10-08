@@ -3,6 +3,7 @@ import * as styles from "./index.module.css";
 import RephraseSVG from "../assets/svg/rephrase.svg";
 import CaretSVG from "../assets/svg/caret.svg";
 import SpellingSVG from "../assets/svg/spelling.svg";
+import LoadingSVG from "../assets/svg/loading.svg";
 
 const selection = getSelection();
 let selectionTimeout: ReturnType<typeof setTimeout>;
@@ -92,7 +93,7 @@ document.addEventListener("selectionchange", () => {
     }, 500);
 });
 
-rephraseBtn.addEventListener("click", generateRephrase);
+rephraseBtn.addEventListener("click", generateRephrase.bind(rephraseBtn, false));
 fixSpellingBtn.addEventListener("click", generateSpellingFix);
 
 acceptButton.addEventListener("click", () => {
@@ -105,15 +106,20 @@ acceptButton.addEventListener("click", () => {
 });
 
 discardButton.addEventListener("click", hideToolbar);
-tryAgainButton.addEventListener("click", generateRephrase);
+tryAgainButton.addEventListener("click", generateRephrase.bind(rephraseBtn, true));
 
-async function generateRephrase() {
+async function generateRephrase(this: HTMLButtonElement, isRetry: boolean) {
+    if (isRetry) {
+        this.style.backgroundColor = "#4f646f";
+    }
+
+    this.innerHTML = LoadingSVG;
+    content.style.display = "block";
+    contentParagraph.innerHTML = "";
+
     try {
         const result = await rephrase(clonedRange.toString(), rephraseSelect.value);
 
-        content.style.display = "block";
-        contentParagraph.innerHTML = "";
-
         for await (const chunk of result.stream) {
             const text = chunk.text();
 
@@ -122,18 +128,22 @@ async function generateRephrase() {
             contentParagraph.insertAdjacentElement("beforeend", spanElement);
         }
     } catch (e) {
-        console.log(e);
+        console.error(e);
         content.style.display = "block";
         contentParagraph.textContent = "Oops ! something went wrong.";
+    } finally {
+        this.removeAttribute("style");
+        this.innerHTML = "rephrase" + RephraseSVG;
     }
 }
 
-async function generateSpellingFix() {
+async function generateSpellingFix(this: HTMLButtonElement) {
+    this.innerHTML = LoadingSVG;
+    content.style.display = "block";
+    contentParagraph.innerHTML = "";
+
     try {
         const result = await fixSpelling(clonedRange.toString());
-
-        content.style.display = "block";
-        contentParagraph.innerHTML = "";
 
         for await (const chunk of result.stream) {
             const text = chunk.text();
@@ -143,9 +153,11 @@ async function generateSpellingFix() {
             contentParagraph.insertAdjacentElement("beforeend", spanElement);
         }
     } catch (e) {
-        console.log(e);
+        console.error(e);
         content.style.display = "block";
         contentParagraph.textContent = "Oops ! something went wrong.";
+    } finally {
+        this.innerHTML = "fix spelling" + SpellingSVG;
     }
 }
 
