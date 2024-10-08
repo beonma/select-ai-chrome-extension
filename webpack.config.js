@@ -27,7 +27,8 @@ module.exports = {
                     MiniCssExtractPlugin.loader,
                     {
                         loader: "css-loader",
-                        options: { modules: { localIdentName: "[hash:base64:6]__[local]" } },
+                        options: { modules: { localIdentName: "[path][name]__[local]" } },
+                        // options: { modules: { localIdentName: "[hash:base64:6]__[local]" } },
                     },
                 ],
             },

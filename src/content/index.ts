@@ -1,4 +1,4 @@
-import { rephrase } from "../utils/ai-script";
+import { fixSpelling, rephrase } from "../utils/ai-script";
 import * as styles from "./index.module.css";
 import RephraseSVG from "../assets/svg/rephrase.svg";
 import CaretSVG from "../assets/svg/caret.svg";
@@ -43,8 +43,14 @@ document.querySelector("body")?.insertAdjacentHTML("afterbegin", html);
 
 const htmlNode = <HTMLElement>document.querySelector(`.${styles.container}`);
 
-const rephraseBtn = <HTMLButtonElement>htmlNode.querySelector("button");
-const rephraseSelect = <HTMLSelectElement>htmlNode.querySelector("select");
+const rephraseBtn = <HTMLButtonElement>(
+    htmlNode.querySelector(`.${styles.toolbar} button:first-child`)
+);
+const fixSpellingBtn = <HTMLButtonElement>(
+    htmlNode.querySelector(`.${styles.toolbar} button:last-child`)
+);
+const rephraseSelect = <HTMLSelectElement>htmlNode.querySelector(`.${styles.toolbar} select`);
+
 const content = <HTMLDivElement>htmlNode.querySelector(`.${styles.content}`);
 const contentParagraph = <HTMLParagraphElement>content.querySelector("p");
 
@@ -87,6 +93,7 @@ document.addEventListener("selectionchange", () => {
 });
 
 rephraseBtn.addEventListener("click", generateRephrase);
+fixSpellingBtn.addEventListener("click", generateSpellingFix);
 
 acceptButton.addEventListener("click", () => {
     const parentElement = clonedRange.startContainer.parentElement;
@@ -103,6 +110,27 @@ tryAgainButton.addEventListener("click", generateRephrase);
 async function generateRephrase() {
     try {
         const result = await rephrase(clonedRange.toString(), rephraseSelect.value);
+
+        content.style.display = "block";
+        contentParagraph.innerHTML = "";
+
+        for await (const chunk of result.stream) {
+            const text = chunk.text();
+
+            const spanElement = document.createElement("span");
+            spanElement.textContent = text;
+            contentParagraph.insertAdjacentElement("beforeend", spanElement);
+        }
+    } catch (e) {
+        console.log(e);
+        content.style.display = "block";
+        contentParagraph.textContent = "Oops ! something went wrong.";
+    }
+}
+
+async function generateSpellingFix() {
+    try {
+        const result = await fixSpelling(clonedRange.toString());
 
         content.style.display = "block";
         contentParagraph.innerHTML = "";
