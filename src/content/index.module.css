@@ -61,6 +61,7 @@
     gap: 6px;
 }
 
+/* TODO look for catch all selector */
 .btn > svg > path {
     transition: stroke 250ms ease, fill 250ms ease;
 }
@@ -71,8 +72,7 @@
     fill: transparent;
 }
 
-.btn svg,
-.toolbar select svg {
+.toolbar svg {
     height: 14px;
     width: 14px;
 }
@@ -92,12 +92,9 @@
 .action__container button {
     font-size: 10px;
     padding: 4px 6px;
-    transition: border 250ms ease;
-    border: 2px solid transparent;
 }
 
 .action__container button:hover {
-    border: 2px solid var(--text-color);
     background-color: transparent;
     color: var(--text-color);
 }

@@ -31,9 +31,9 @@ const html = `
     <div class="${styles.content}">
         <p></p>
         <div class="${styles.action__container}">
-            <button id="accept" class="${styles.btn}">accept</button>
-            <button id="discard" class="${styles.btn}">discard</button>
-            <button id="try-again" class="${styles.btn}">try again</button>
+            <button class="${styles.btn}">accept</button>
+            <button class="${styles.btn}">discard</button>
+            <button class="${styles.btn}">try again</button>
         </div>
     </div>
 </div>
@@ -48,8 +48,15 @@ const rephraseSelect = <HTMLSelectElement>htmlNode.querySelector("select");
 const content = <HTMLDivElement>htmlNode.querySelector(`.${styles.content}`);
 const contentParagraph = <HTMLParagraphElement>content.querySelector("p");
 
-// const acceptButton = <HTMLButtonElement>content.querySelector("#accept");
-// const discardButton = <HTMLButtonElement>content.querySelector("#discard");
+const acceptButton = <HTMLButtonElement>(
+    content.querySelector(`.${styles.action__container} button:first-child`)
+);
+const discardButton = <HTMLButtonElement>(
+    content.querySelector(`.${styles.action__container} button:nth-child(2)`)
+);
+const tryAgainButton = <HTMLButtonElement>(
+    content.querySelector(`.${styles.action__container} button:last-child`)
+);
 
 document.addEventListener("click", event => {
     // COMMENT typescript forcing as Node in event.target
@@ -57,9 +64,7 @@ document.addEventListener("click", event => {
         return;
     }
 
-    htmlNode.style.display = "none";
-    content.style.display = "none";
-    contentParagraph.innerHTML = "";
+    hideToolbar();
 });
 
 document.addEventListener("selectionchange", () => {
@@ -78,15 +83,24 @@ document.addEventListener("selectionchange", () => {
         htmlNode.style.left = `${offsetX}px`;
 
         clonedRange = range.cloneRange();
-        console.log(clonedRange);
     }, 500);
 });
 
-rephraseBtn?.addEventListener("click", async () => {
-    if (selection === null) {
-        return;
-    }
+rephraseBtn.addEventListener("click", generateRephrase);
 
+acceptButton.addEventListener("click", () => {
+    const parentElement = clonedRange.startContainer.parentElement;
+
+    if (parentElement) {
+        parentElement.textContent = contentParagraph.textContent;
+        hideToolbar();
+    }
+});
+
+discardButton.addEventListener("click", hideToolbar);
+tryAgainButton.addEventListener("click", generateRephrase);
+
+async function generateRephrase() {
     try {
         const result = await rephrase(clonedRange.toString(), rephraseSelect.value);
 
@@ -101,7 +115,14 @@ rephraseBtn?.addEventListener("click", async () => {
             contentParagraph.insertAdjacentElement("beforeend", spanElement);
         }
     } catch (e) {
+        console.log(e);
         content.style.display = "block";
-        content.textContent = "Oops ! something went wrong.";
+        contentParagraph.textContent = "Oops ! something went wrong.";
     }
-});
+}
+
+function hideToolbar() {
+    htmlNode.style.display = "none";
+    content.style.display = "none";
+    contentParagraph.innerHTML = "";
+}
