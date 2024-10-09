@@ -108,6 +108,12 @@ acceptButton.addEventListener("click", () => {
 discardButton.addEventListener("click", hideToolbar);
 tryAgainButton.addEventListener("click", generateRephrase.bind(rephraseBtn, true));
 
+document.addEventListener("keydown", e => {
+    if (e.code === "Escape" || selection?.type !== "Range") {
+        hideToolbar();
+    }
+});
+
 async function generateRephrase(this: HTMLButtonElement, isRetry: boolean) {
     if (isRetry) {
         this.style.backgroundColor = "#4f646f";
