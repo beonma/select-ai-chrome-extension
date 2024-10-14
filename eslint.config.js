@@ -1,11 +1,11 @@
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
+import prettierConfig from "eslint-config-prettier";
 
 export default tseslint.config({
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended, prettierConfig],
     files: ["src/**/*.ts"],
     rules: {
         "no-console": ["warn", { allow: ["error", "warn"] }],
-        // "prettier/prettier": ["warn", { endOfLine: "auto", bracketSpacing: true, printWidth: 100 }],
     },
 });
