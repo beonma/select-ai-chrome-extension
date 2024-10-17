@@ -5,7 +5,8 @@ import CaretSVG from "../assets/svg/caret.svg";
 import SpellingSVG from "../assets/svg/spelling.svg";
 import LoadingSVG from "../assets/svg/loading.svg";
 
-let selectionTimeout: ReturnType<typeof setTimeout>;
+let selectionTimeoutDOM: ReturnType<typeof setTimeout>;
+let selectionTimeoutInput: ReturnType<typeof setTimeout>;
 let selectionRef: {
     parent: HTMLElement | HTMLInputElement | HTMLTextAreaElement;
     isInput: boolean;
@@ -87,7 +88,7 @@ document.addEventListener("keydown", e => {
 editableElements.forEach(el => {
     el.addEventListener("select", event => {
         // COMMENT The event continues to trigger even after interacting with the toolbar element (absolute element), despite no changes in the text selection.
-        // INFO no need to add clearTimeout(selectionTimeout), it gets called every time in selectionchange listener
+        clearTimeout(selectionTimeoutInput);
 
         const target = event.target as HTMLInputElement | HTMLTextAreaElement;
 
@@ -103,7 +104,7 @@ editableElements.forEach(el => {
         const selectionEnd = target.selectionEnd;
         const selection = target.value.substring(selectionStart, selectionEnd);
 
-        selectionTimeout = setTimeout(() => {
+        selectionTimeoutInput = setTimeout(() => {
             showToolbar(target.getBoundingClientRect());
 
             selectionRef = {
@@ -118,7 +119,7 @@ editableElements.forEach(el => {
 });
 
 document.addEventListener("selectionchange", () => {
-    clearTimeout(selectionTimeout);
+    clearTimeout(selectionTimeoutDOM);
 
     const selection = window.getSelection();
 
@@ -133,7 +134,7 @@ document.addEventListener("selectionchange", () => {
         return;
     }
 
-    selectionTimeout = setTimeout(() => {
+    selectionTimeoutDOM = setTimeout(() => {
         showToolbar(range.getBoundingClientRect());
 
         selectionRef = {
