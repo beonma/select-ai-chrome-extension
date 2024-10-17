@@ -65,7 +65,9 @@ document.addEventListener("click", event => {
     // COMMENT typescript forcing as Node in event.target
     // TODO To hide the toolbar, up to two clicks are required within the parent element of the currently selected text.
     if (htmlNode.contains(event.target as Node)) {
-        window.getSelection()?.removeAllRanges();
+        if (selectionRef.isInput) {
+            window.getSelection()?.removeAllRanges();
+        }
         return;
     }
 
