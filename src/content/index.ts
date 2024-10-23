@@ -15,7 +15,17 @@ let selectionRef: {
     text: string;
 };
 
-const rephraseTones = ["formal", "convince", "normal", "angry"];
+const rephraseTones = [
+    "formal",
+    "informal",
+    "friendly",
+    "persuasive",
+    "neutral",
+    "assertive",
+    "apologetic",
+    "humorous",
+    "sympathetic",
+];
 const buttons = ["accept", "discard", "try again"];
 
 const html = `
@@ -65,6 +75,7 @@ const tryAgainButton = <HTMLButtonElement>content.querySelector(`.${styles.actio
 document.addEventListener("click", event => {
     // COMMENT typescript forcing as Node in event.target
     // TODO To hide the toolbar, up to two clicks are required within the parent element of the currently selected text.
+
     if (htmlNode.contains(event.target as Node)) {
         if (selectionRef.isInput) {
             window.getSelection()?.removeAllRanges();
@@ -88,6 +99,7 @@ document.addEventListener("keydown", e => {
 editableElements.forEach(el => {
     el.addEventListener("select", event => {
         // COMMENT The event continues to trigger even after interacting with the toolbar element (absolute element), despite no changes in the text selection.
+
         clearTimeout(selectionTimeoutInput);
 
         const target = event.target as HTMLInputElement | HTMLTextAreaElement;
