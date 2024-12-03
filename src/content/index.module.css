@@ -5,6 +5,10 @@
     font-style: normal;
 }
 
+.container * {
+    font: inherit;
+}
+
 .container {
     --accent-color: #4f646f;
     --text-color: #535657;
@@ -50,8 +54,9 @@
     text-transform: capitalize;
     font-size: 12px;
     font-weight: 500;
-    color: var(--text-color);
-    padding: 6px 8px;
+    color: var(--text-color) !important;
+    background-color: white !important;
+    padding: 6px 8px !important;
     border-radius: 50px;
     transition: background-color 250ms ease, color 250ms ease;
     cursor: pointer;
@@ -60,13 +65,12 @@
     gap: 6px;
 }
 
-/* TODO look for catch all selector */
-.btn > svg > path {
+.btn path {
     transition: stroke 250ms ease, fill 250ms ease;
 }
 
-.btn:hover > svg > path,
-.btn:focus > svg > path {
+.btn:hover path,
+.btn:focus path {
     stroke: white;
     fill: transparent;
 }
@@ -78,8 +82,8 @@
 
 .btn:hover,
 .btn:focus {
-    background-color: var(--accent-color);
-    color: white;
+    background-color: var(--accent-color) !important;
+    color: white !important;
 }
 
 .action__container {
@@ -88,14 +92,14 @@
     animation: fadeIn 1000ms ease forwards;
 }
 
-.action__container button {
+.action__container .btn {
     font-size: 10px;
     padding: 4px 6px;
 }
 
-.action__container button:hover {
-    background-color: transparent;
-    color: var(--text-color);
+.action__container .btn:hover {
+    background-color: transparent !important;
+    color: var(--text-color) !important;
 }
 
 .select__container {
@@ -106,15 +110,15 @@
 .select__container select {
     font-family: inherit;
     font-size: 12px;
+    padding: 5px 8px !important;
     font-weight: 500;
-    color: var(--text-color);
-    padding: 5px 8px;
+    color: var(--text-color) !important;
     width: 90px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    border: 0;
-    background-color: transparent;
+    border: 0 !important;
+    background-color: transparent !important;
     padding-right: 16px;
     border-radius: 50px;
     outline: none;
