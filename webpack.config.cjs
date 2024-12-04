@@ -5,6 +5,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const Dotenv = require("dotenv-webpack");
 
+const devMode = process.env.NODE_ENV !== "production";
+
 module.exports = {
     mode: "development",
     entry: {
@@ -19,7 +21,7 @@ module.exports = {
     resolve: { extensions: [".ts", ".tsx"] },
     module: {
         rules: [
-            { test: /\.tsx?$/, use: "ts-loader", exclude: /node_modules/ },
+            { test: /\.tsx?$/, use: devMode ? "ts-loader" : "babel-loader", exclude: /node_modules/ },
             { test: /\.svg$/, use: "svg-inline-loader" },
             {
                 test: /\.css$/,
@@ -27,8 +29,9 @@ module.exports = {
                     MiniCssExtractPlugin.loader,
                     {
                         loader: "css-loader",
-                        options: { modules: { localIdentName: "[path][name]__[local]" } },
-                        // options: { modules: { localIdentName: "[hash:base64:6]__[local]" } },
+                        options: {
+                            modules: { localIdentName: devMode ? "[path][name]__[local]" : "[hash:base64:6]__[local]" },
+                        },
                     },
                 ],
             },
