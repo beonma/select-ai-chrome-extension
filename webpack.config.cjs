@@ -11,6 +11,7 @@ module.exports = {
     mode: "development",
     entry: {
         content: "./src/content/index.ts",
+        popup: "./src/popup/index.tsx",
     },
     output: {
         path: path.resolve(__dirname, "dist"),
