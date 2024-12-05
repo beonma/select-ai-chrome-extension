@@ -1,9 +1,15 @@
 /** @type {import('tailwindcss').Config} */
+
+import defaultTheme from "tailwindcss/defaultTheme";
+
 export default {
-    mode: "jit",
-    content: ["./src/popup/**/*.tsx"],
+    content: ["./src/popup/**/*.tsx", "./static/*.html"],
     theme: {
-        extend: {},
+        extend: {
+            fontFamily: {
+                poppins: ["Poppins", ...defaultTheme.fontFamily.mono],
+            },
+        },
     },
     plugins: [],
 };

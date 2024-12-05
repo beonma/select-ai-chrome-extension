@@ -1,7 +1,7 @@
 function App() {
     return (
-        <div>
-            <h1>hello from</h1>
+        <div className="p-4">
+            <h1 className="text-3xl">settings</h1>
         </div>
     );
 }
