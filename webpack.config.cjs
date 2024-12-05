@@ -23,7 +23,12 @@ module.exports = {
     },
     devtool: "cheap-source-map",
     target: ["web", "es5"],
-    resolve: { extensions: [".ts", ".tsx"] },
+    resolve: {
+        extensions: [".ts", ".tsx"],
+        alias: {
+            "@": path.resolve(__dirname, "src", "popup"),
+        },
+    },
     module: {
         rules: [
             {
