@@ -25,7 +25,7 @@ module.exports = {
             { test: /\.tsx?$/, use: devMode ? "ts-loader" : "babel-loader", exclude: /node_modules/ },
             { test: /\.svg$/, use: "svg-inline-loader" },
             {
-                test: /\.css$/,
+                test: /\.module\.css$/,
                 use: [
                     MiniCssExtractPlugin.loader,
                     {
@@ -35,6 +35,10 @@ module.exports = {
                         },
                     },
                 ],
+            },
+            {
+                test: /(?<!\.module)\.css$/,
+                use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
             },
         ],
     },
