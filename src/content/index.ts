@@ -4,11 +4,12 @@ import RephraseSVG from "../assets/svg/rephrase.svg";
 import CaretSVG from "../assets/svg/caret.svg";
 import SpellingSVG from "../assets/svg/spelling.svg";
 import LoadingSVG from "../assets/svg/loading.svg";
+import type { EditableElement } from "src/types";
 
 let selectionTimeoutDOM: ReturnType<typeof setTimeout>;
 let selectionTimeoutInput: ReturnType<typeof setTimeout>;
 let selectionRef: {
-    parent: HTMLElement | HTMLInputElement | HTMLTextAreaElement;
+    parent: HTMLElement | EditableElement;
     isInput: boolean;
     start: number;
     end: number;
@@ -26,6 +27,7 @@ const rephraseTones = [
     "humorous",
     "sympathetic",
 ];
+
 const buttons = ["accept", "discard", "try again"];
 
 const html = `
@@ -100,39 +102,12 @@ editableElements.forEach(el => {
     el.addEventListener("select", event => {
         // COMMENT The event continues to trigger even after interacting with the toolbar element (absolute element), despite no changes in the text selection.
 
-        clearTimeout(selectionTimeoutInput);
-
-        const target = event.target as HTMLInputElement | HTMLTextAreaElement;
-
-        if (
-            typeof target.selectionStart !== "number" ||
-            typeof target.selectionEnd !== "number" ||
-            (target.selectionStart === 0 && target.selectionEnd === 0)
-        ) {
-            return;
-        }
-
-        const selectionStart = target.selectionStart;
-        const selectionEnd = target.selectionEnd;
-        const selection = target.value.substring(selectionStart, selectionEnd);
-
-        selectionTimeoutInput = setTimeout(() => {
-            showToolbar(target.getBoundingClientRect());
-
-            selectionRef = {
-                text: selection,
-                parent: target,
-                start: selectionStart,
-                end: selectionEnd,
-                isInput: true,
-            };
-        }, 500);
+        const editableTarget = event.target as EditableElement;
+        showOnEditableElement(editableTarget);
     });
 });
 
 document.addEventListener("selectionchange", () => {
-    clearTimeout(selectionTimeoutDOM);
-
     const selection = window.getSelection();
 
     if (selection?.type !== "Range") {
@@ -143,20 +118,18 @@ document.addEventListener("selectionchange", () => {
     const parentElement = range.startContainer.parentElement;
 
     if (range.toString() === "" || !parentElement) {
+        // INFO This is a fallback mechanism. Sometimes, selection on an input element triggers a DOM selection event. This code acts as a last resort to check if a selection exists within a nested input element.
+
+        const editableTarget = geEditableChild(range.startContainer);
+
+        if (editableTarget) {
+            showOnEditableElement(editableTarget);
+        }
+
         return;
     }
 
-    selectionTimeoutDOM = setTimeout(() => {
-        showToolbar(range.getBoundingClientRect());
-
-        selectionRef = {
-            parent: parentElement,
-            text: range.toString(),
-            isInput: false,
-            start: range.startOffset,
-            end: range.endOffset,
-        };
-    }, 500);
+    showOnSelectionChange(range, parentElement);
 });
 
 rephraseBtn.addEventListener("click", generateRephrase.bind(rephraseBtn, false));
@@ -254,4 +227,60 @@ function getNewContent(content: string): string {
         contentParagraph.textContent +
         content.slice(selectionRef.end || content.length - 1, content.length - 1)
     );
+}
+
+function geEditableChild(target: Node): EditableElement | void {
+    for (const node of Array.from(target.childNodes)) {
+        if (/INPUT|TEXTAREA/.test(node.nodeName)) {
+            return node as EditableElement;
+        }
+
+        if (node.hasChildNodes()) {
+            geEditableChild(node);
+        }
+    }
+}
+
+function showOnEditableElement(target: EditableElement): void {
+    clearTimeout(selectionTimeoutInput);
+
+    if (
+        typeof target.selectionStart !== "number" ||
+        typeof target.selectionEnd !== "number" ||
+        (target.selectionStart === 0 && target.selectionEnd === 0)
+    ) {
+        return;
+    }
+
+    const selectionStart = target.selectionStart;
+    const selectionEnd = target.selectionEnd;
+    const selectionInput = target.value.substring(selectionStart!, selectionEnd!);
+
+    selectionTimeoutInput = setTimeout(() => {
+        showToolbar(target.getBoundingClientRect());
+
+        selectionRef = {
+            text: selectionInput,
+            parent: target!,
+            start: selectionStart!,
+            end: selectionEnd!,
+            isInput: true,
+        };
+    }, 500);
+}
+
+function showOnSelectionChange(range: Range, parent: HTMLElement): void {
+    clearTimeout(selectionTimeoutDOM);
+
+    selectionTimeoutDOM = setTimeout(() => {
+        showToolbar(range.getBoundingClientRect());
+
+        selectionRef = {
+            parent: parent,
+            text: range.toString(),
+            isInput: false,
+            start: range.startOffset,
+            end: range.endOffset,
+        };
+    }, 500);
 }

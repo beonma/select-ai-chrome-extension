@@ -1,2 +1,1 @@
-declare module "*.module.css";
-declare module "*.svg";
+export type EditableElement = HTMLInputElement | HTMLTextAreaElement;
