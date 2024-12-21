@@ -4,6 +4,8 @@ import RephraseSVG from "../assets/svg/rephrase.svg";
 import CaretSVG from "../assets/svg/caret.svg";
 import SpellingSVG from "../assets/svg/spelling.svg";
 import LoadingSVG from "../assets/svg/loading.svg";
+import CopySVG from "../assets/svg/copy.svg";
+import CheckSVG from "../assets/svg/check.svg";
 import type { EditableElement } from "src/types";
 
 let selectionTimeoutDOM: ReturnType<typeof setTimeout>;
@@ -51,7 +53,10 @@ const html = `
     <div class="${styles.content}">
         <p></p>
         <div class="${styles.action__container}">
-            ${buttons.map(btn => `<button class="${styles.btn}">${btn}</button>`).join("")}
+            <div class="${styles.action__btns_left_container}">
+                ${buttons.map(btn => `<button class="${styles.btn}">${btn}</button>`).join("")}
+            </div>
+            <button class="${styles.btn} ${styles.copyBtn}">${CopySVG}</button>
         </div>
     </div>
 </div>
@@ -70,9 +75,10 @@ const rephraseSelect = <HTMLSelectElement>htmlNode.querySelector(`.${styles.tool
 const content = <HTMLDivElement>htmlNode.querySelector(`.${styles.content}`);
 const contentParagraph = <HTMLParagraphElement>content.querySelector("p");
 
-const acceptButton = <HTMLButtonElement>content.querySelector(`.${styles.action__container} button:first-child`);
-const discardButton = <HTMLButtonElement>content.querySelector(`.${styles.action__container} button:nth-child(2)`);
-const tryAgainButton = <HTMLButtonElement>content.querySelector(`.${styles.action__container} button:last-child`);
+const acceptButton = <HTMLButtonElement>content.querySelector(`.${styles.action__container} div button:first-child`);
+const discardButton = <HTMLButtonElement>content.querySelector(`.${styles.action__container} div button:nth-child(2)`);
+const tryAgainButton = <HTMLButtonElement>content.querySelector(`.${styles.action__container} div button:last-child`);
+const copyButton = <HTMLButtonElement>content.querySelector(`.${styles.action__container} > button`);
 
 document.addEventListener("click", event => {
     // COMMENT typescript forcing as Node in event.target
@@ -153,6 +159,16 @@ acceptButton.addEventListener("click", () => {
 
 discardButton.addEventListener("click", hideToolbar);
 tryAgainButton.addEventListener("click", generateRephrase.bind(rephraseBtn, true));
+copyButton.addEventListener("click", () => {
+    if (contentParagraph.textContent) {
+        navigator.clipboard.writeText(contentParagraph.textContent);
+        copyButton.innerHTML = CheckSVG;
+
+        setTimeout(() => {
+            copyButton.innerHTML = CopySVG;
+        }, 3000);
+    }
+});
 
 async function generateRephrase(this: HTMLButtonElement, isRetry: boolean) {
     if (isRetry) {

@@ -88,8 +88,13 @@
 
 .action__container {
     display: flex;
-    gap: 2px;
     animation: fadeIn 1000ms ease forwards;
+    justify-content: space-between;
+}
+
+.action__btns_left_container {
+    display: flex;
+    gap: 2px;
 }
 
 .action__container .btn {
@@ -108,7 +113,7 @@
 }
 
 .select__container select {
-    font-family: inherit;
+    font-family: inherit !important;
     font-size: 12px;
     padding: 5px 8px !important;
     font-weight: 500;
@@ -159,6 +164,26 @@
 
 .content p span {
     animation: fadeIn 1000ms ease forwards;
+}
+
+.copyBtn svg {
+    height: 14px;
+    width: 14px;
+}
+
+.copyBtn:hover,
+.copyBtn:focus {
+    background-color: white !important;
+}
+
+.copyBtn:hover path,
+.copyBtn:focus path {
+    fill: var(--text-color);
+    stroke: transparent;
+}
+
+.copyBtn path {
+    fill: var(--text-color);
 }
 
 @keyframes fadeIn {
