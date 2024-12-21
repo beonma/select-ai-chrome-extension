@@ -84,7 +84,9 @@ document.addEventListener("click", event => {
     // COMMENT typescript forcing as Node in event.target
     // TODO To hide the toolbar, up to two clicks are required within the parent element of the currently selected text.
 
-    if (htmlNode.contains(event.target as Node)) {
+    // INFO The OR operator in this if statement is added to handle a specific case where the path of the SVG is clicked. In this scenario, the parent element could not be determined, and thus this check could not verify if it was within the html node.
+
+    if (htmlNode.contains(event.target as Node) || htmlNode.contains(event.currentTarget as Node)) {
         if (selectionRef.isInput) {
             window.getSelection()?.removeAllRanges();
         }
@@ -159,9 +161,9 @@ acceptButton.addEventListener("click", () => {
 
 discardButton.addEventListener("click", hideToolbar);
 tryAgainButton.addEventListener("click", generateRephrase.bind(rephraseBtn, true));
-copyButton.addEventListener("click", () => {
+copyButton.addEventListener("click", async () => {
     if (contentParagraph.textContent) {
-        navigator.clipboard.writeText(contentParagraph.textContent);
+        await navigator.clipboard.writeText(contentParagraph.textContent);
         copyButton.innerHTML = CheckSVG;
 
         setTimeout(() => {
