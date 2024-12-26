@@ -6,12 +6,16 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const Dotenv = require("dotenv-webpack");
 
-const devMode = process.env.NODE_ENV !== "production";
+const mode = process.env.NODE_ENV || "development";
+const isDev = mode === "development";
 
 module.exports = {
-    mode: "development",
+    mode,
     watchOptions: {
         ignored: /node_modules/,
+    },
+    performance: {
+        hints: false,
     },
     entry: {
         content: "./src/content/index.ts",
@@ -21,10 +25,10 @@ module.exports = {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].bundle.js",
     },
-    devtool: "cheap-source-map",
+    devtool: isDev ? "inline-cheap-source-map" : false,
     target: ["web", "es5"],
     resolve: {
-        extensions: [".ts", ".tsx"],
+        extensions: [".js", ".ts", ".tsx"],
         alias: {
             "@": path.resolve(__dirname, "src", "popup"),
         },
@@ -44,7 +48,9 @@ module.exports = {
                     {
                         loader: "css-loader",
                         options: {
-                            modules: { localIdentName: devMode ? "[path][name]__[local]" : "[hash:base64:6]__[local]" },
+                            modules: {
+                                localIdentName: isDev ? "[path][name]__[local]" : "[hash:base64:6]__[local]",
+                            },
                         },
                     },
                 ],
