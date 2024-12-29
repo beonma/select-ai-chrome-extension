@@ -5,23 +5,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 type Props = {
     children?: React.ReactNode;
     label: string;
-    items: string[];
+    items: { text: string; value: string }[];
+    onChange: (value: string) => void;
+    value: string;
 };
 
 const SelectField = (props: Props) => {
     return (
-        <div className="w-full flex flex-col gap-2">
+        <div className="overflow-x-hidden flex-1 flex flex-col gap-2">
             <Label htmlFor="provider" className="leading-5 capitalize">
                 {props.label}
             </Label>
-            <Select>
-                <SelectTrigger>
-                    <SelectValue placeholder="none" />
+            <Select
+                onValueChange={value => {
+                    props.onChange(value);
+                }}
+                value={props.value}>
+                <SelectTrigger className="ring-inset">
+                    <SelectValue placeholder="choose" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sticky="always" className="max-h-52 max-w-48">
                     {props.items.map(item => (
-                        <SelectItem key={item} value={item}>
-                            {item}
+                        <SelectItem className="text-xs" key={item.value} value={item.value}>
+                            {item.text}
                         </SelectItem>
                     ))}
                 </SelectContent>
