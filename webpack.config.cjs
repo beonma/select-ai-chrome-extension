@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const Dotenv = require("dotenv-webpack");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 const mode = process.env.NODE_ENV || "development";
 const isDev = mode === "development";
@@ -31,6 +32,22 @@ module.exports = {
         extensions: [".js", ".ts", ".tsx"],
         alias: {
             "@": path.resolve(__dirname, "src", "popup"),
+        },
+    },
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                react: {
+                    test: /[\\/]node_modules[\\/]((react|@radix|@remix).*)[\\/]/,
+                    name: "react.vendor",
+                    chunks: "all",
+                },
+                common: {
+                    test: /[\\/]node_modules[\\/]((?!react|@radix|@remix).*)[\\/]/,
+                    name: "common.vendor",
+                    chunks: "all",
+                },
+            },
         },
     },
     module: {
@@ -66,5 +83,6 @@ module.exports = {
         new CopyWebpackPlugin({ patterns: [{ from: "static" }] }),
         new Dotenv({ safe: true, path: "./.env" }),
         new ForkTsCheckerWebpackPlugin(),
+        new BundleAnalyzerPlugin({ openAnalyzer: false }),
     ],
 };
