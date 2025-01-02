@@ -44,11 +44,6 @@ module.exports = {
                     name: "react.vendor",
                     chunks: "all",
                 },
-                common: {
-                    test: /[\\/]node_modules[\\/]((?!.*react|@radix|@remix).*)[\\/]/,
-                    name: "common.vendor",
-                    chunks: "all",
-                },
             },
         },
     },
