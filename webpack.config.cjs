@@ -1,6 +1,7 @@
 /** @type {import("webpack").Configuration} */
 
 const path = require("path");
+const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
@@ -26,24 +27,25 @@ module.exports = {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].bundle.js",
     },
-    devtool: isDev ? "inline-cheap-source-map" : false,
+    devtool: false,
     target: ["web", "es5"],
     resolve: {
         extensions: [".js", ".ts", ".tsx"],
         alias: {
             "@": path.resolve(__dirname, "src", "popup"),
+            "@src": path.resolve(__dirname, "src"),
         },
     },
     optimization: {
         splitChunks: {
             cacheGroups: {
                 react: {
-                    test: /[\\/]node_modules[\\/]((react|@radix|@remix).*)[\\/]/,
+                    test: /[\\/]node_modules[\\/]((.*react|@radix|@remix).*)[\\/]/,
                     name: "react.vendor",
                     chunks: "all",
                 },
                 common: {
-                    test: /[\\/]node_modules[\\/]((?!react|@radix|@remix).*)[\\/]/,
+                    test: /[\\/]node_modules[\\/]((?!.*react|@radix|@remix).*)[\\/]/,
                     name: "common.vendor",
                     chunks: "all",
                 },
@@ -84,5 +86,6 @@ module.exports = {
         new Dotenv({ safe: true, path: "./.env" }),
         new ForkTsCheckerWebpackPlugin(),
         new BundleAnalyzerPlugin({ openAnalyzer: false }),
+        isDev && new webpack.SourceMapDevToolPlugin({ exclude: [/.vendor.bundle.js$/] }),
     ],
 };

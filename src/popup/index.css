@@ -9,10 +9,18 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: "Poppins-SemiBold";
+    src: url("chrome-extension://__MSG_@@extension_id__/fonts/Poppins-SemiBold.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
 @layer base {
     :root {
         --background: 0 0% 100%;
-        --foreground: 222.2 47.4% 11.2%;
+        /* --foreground: 222.2 47.4% 11.2%; */
+        --foreground: 195 2.4% 9%;
         --muted: 210 40% 96.1%;
         --muted-foreground: 215.4 16.3% 46.9%;
         --popover: 0 0% 100%;
@@ -21,7 +29,8 @@
         --input: 214.3 31.8% 91.4%;
         --card: 0 0% 100%;
         --card-foreground: 222.2 47.4% 11.2%;
-        --primary: 222.2 47.4% 11.2%;
+        /* --primary: 222.2 47.4% 11.2%; */
+        --primary: 201 16.8% 37.3%;
         --primary-foreground: 210 40% 98%;
         --secondary: 210 40% 96.1%;
         --secondary-foreground: 222.2 47.4% 11.2%;
@@ -29,8 +38,8 @@
         --accent-foreground: 222.2 47.4% 11.2%;
         --destructive: 0 100% 50%;
         --destructive-foreground: 210 40% 98%;
-        --ring: 215 20.2% 65.1%;
-        --radius: 0.5rem;
+        --ring: 201 16.8% 37.3%;
+        --radius: 2rem;
     }
 
     .dark {

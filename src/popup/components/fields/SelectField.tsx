@@ -24,7 +24,7 @@ const SelectField = (props: Props) => {
                 <SelectTrigger className="ring-inset">
                     <SelectValue placeholder="choose" />
                 </SelectTrigger>
-                <SelectContent position="popper" sticky="always" className="max-h-52 max-w-48">
+                <SelectContent className="max-h-52 max-w-48 rounded-xs">
                     {props.items.map(item => (
                         <SelectItem className="text-xs" key={item.value} value={item.value}>
                             {item.text}
