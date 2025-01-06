@@ -10,3 +10,11 @@ export type Credential = {
     apiKey: string;
     isDefault: boolean;
 };
+
+export type ProviderPayload = {
+    model: string;
+    apiKey: string;
+    host: string;
+};
+
+export type SDKProviderPayload = Pick<ProviderPayload, "model" | "apiKey">;

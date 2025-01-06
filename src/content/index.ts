@@ -1,4 +1,3 @@
-import { fixSpelling, rephrase } from "../utils/ai-script";
 import * as styles from "./index.module.css";
 import RephraseSVG from "../assets/svg/rephrase.svg";
 import CaretSVG from "../assets/svg/caret.svg";
@@ -7,6 +6,10 @@ import LoadingSVG from "../assets/svg/loading.svg";
 import CopySVG from "../assets/svg/copy.svg";
 import CheckSVG from "../assets/svg/check.svg";
 import type { EditableElement } from "src/types";
+import GroqCloud from "@src/providers/GroqCloud";
+
+const GROQ_API_KEY = process.env.GROQ_API_KEY as string;
+const provider = new GroqCloud({ model: "llama3-70b-8192", apiKey: GROQ_API_KEY });
 
 let selectionTimeoutDOM: ReturnType<typeof setTimeout>;
 let selectionTimeoutInput: ReturnType<typeof setTimeout>;
@@ -182,13 +185,11 @@ async function generateRephrase(this: HTMLButtonElement, isRetry: boolean) {
     contentParagraph.innerHTML = "";
 
     try {
-        const result = await rephrase(selectionRef.text, rephraseSelect.value);
+        const result = provider.rephrase(selectionRef.text, rephraseSelect.value);
 
-        for await (const chunk of result.stream) {
-            const text = chunk.text();
-
+        for await (const chunk of result) {
             const spanElement = document.createElement("span");
-            spanElement.textContent = text;
+            spanElement.textContent = chunk;
             contentParagraph.insertAdjacentElement("beforeend", spanElement);
         }
     } catch (e) {
@@ -207,13 +208,11 @@ async function generateSpellingFix(this: HTMLButtonElement) {
     contentParagraph.innerHTML = "";
 
     try {
-        const result = await fixSpelling(selectionRef.text);
+        const result = provider.fixSpelling(selectionRef.text);
 
-        for await (const chunk of result.stream) {
-            const text = chunk.text();
-
+        for await (const chunk of result) {
             const spanElement = document.createElement("span");
-            spanElement.textContent = text;
+            spanElement.textContent = chunk;
             contentParagraph.insertAdjacentElement("beforeend", spanElement);
         }
     } catch (e) {
