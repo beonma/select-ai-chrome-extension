@@ -22,7 +22,7 @@ const Model = ({ credential, ...props }: Props) => {
     }
 
     return (
-        <div className="flex justify-between items-start gap-4">
+        <div className="animate-fadeIn-1 flex justify-between items-start gap-4">
             <div className="truncate">
                 <p className="truncate text-base">{credential.name}</p>
                 <span className="text-xs text-gray-500">
@@ -31,7 +31,10 @@ const Model = ({ credential, ...props }: Props) => {
             </div>
             <div className="flex">
                 {!credential.isDefault && (
-                    <Button onClick={setDefaultModel} className="text-xs mr-1 px-2 py-1" variant="outline">
+                    <Button
+                        onClick={setDefaultModel}
+                        className="animate-fadeIn-1 text-xs mr-1 px-2 py-1"
+                        variant="outline">
                         set default
                     </Button>
                 )}

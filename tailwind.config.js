@@ -51,6 +51,15 @@ export default {
                 sm: "calc(var(--radius) - 8px)",
                 xs: "calc(var(--radius) - 16px)",
             },
+            keyframes: {
+                fadeIn: {
+                    "0%": { transform: "translateY(10px)", opacity: 0 },
+                    "100%": { transform: "translateY(0px)", opacity: 1 },
+                },
+            },
+            animation: {
+                "fadeIn-1": "fadeIn 300ms ease",
+            },
         },
     },
     plugins: [require("tailwindcss-animate")],
