@@ -22,6 +22,7 @@ module.exports = {
     entry: {
         content: "./src/content/index.ts",
         popup: "./src/popup/index.tsx",
+        "service-worker": "./src/worker/index.ts",
     },
     output: {
         path: path.resolve(__dirname, "dist"),

@@ -15,6 +15,9 @@
             "matches": ["<all_urls>"]
         }
     ],
+    "background": {
+        "service_worker": "service-worker.bundle.js"
+    },
     "web_accessible_resources": [
         {
             "matches": ["<all_urls>"],
