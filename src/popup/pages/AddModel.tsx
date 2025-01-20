@@ -13,12 +13,14 @@ type Props = {
     children?: React.ReactNode;
 };
 
+type FormState = Omit<Credential, "apiKey"> & { apiKey: string };
+
 const providersList = Object.keys(PROVIDERS) as ProviderId[];
 
 const AddModel = (_props: Props): React.JSX.Element => {
     const navigate = useNavigate();
 
-    const [formState, setFormState] = useState<Credential>({
+    const [formState, setFormState] = useState<FormState>({
         id: getNewId(),
         name: "",
         provider: "groq",
@@ -28,19 +30,34 @@ const AddModel = (_props: Props): React.JSX.Element => {
     });
 
     function onProviderChangeHandler(value: string) {
-        setFormState(prev => ({ ...prev, provider: value as ProviderId, model: "", apiKey: "" }));
+        setFormState(prev => ({
+            ...prev,
+            provider: value as ProviderId,
+            model: "",
+            apiKey: "",
+        }));
     }
 
     function onModelChangeHandler(value: string) {
         setFormState(prev => ({ ...prev, model: value }));
     }
 
+    // COMMENT odd function behavior when run on debugger
     async function onFormSubmitHandler() {
         if ((Object.keys(formState) as (keyof Credential)[]).some(input => formState[input] === "")) {
             return;
         }
 
-        await addCredential(formState);
+        const encryptionRequest = await fetch((process.env.WORKER_URL_DEV as string) + "/encrypt", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data: formState.apiKey }),
+        });
+
+        const { encryptedData, iv } = (await encryptionRequest.json()) as { encryptedData: string; iv: string };
+        const credential: Credential = { ...formState, apiKey: { encryptedData, iv } };
+
+        await addCredential(credential);
         navigate("/");
     }
 

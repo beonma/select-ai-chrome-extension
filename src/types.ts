@@ -7,7 +7,7 @@ export type Credential = {
     name: string;
     provider: ProviderId;
     model: string;
-    apiKey: string;
+    apiKey: { encryptedData: string; iv: string };
     isDefault: boolean;
 };
 
