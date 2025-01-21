@@ -8,6 +8,7 @@ import { getNewId } from "@src/utils/misc";
 import { addCredential } from "@src/utils/storage";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
+import { encryptRequest } from "@src/utils/encryption";
 
 type Props = {
     children?: React.ReactNode;
@@ -48,13 +49,7 @@ const AddModel = (_props: Props): React.JSX.Element => {
             return;
         }
 
-        const encryptionRequest = await fetch((process.env.WORKER_URL_DEV as string) + "/encrypt", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ data: formState.apiKey }),
-        });
-
-        const { encryptedData, iv } = (await encryptionRequest.json()) as { encryptedData: string; iv: string };
+        const { encryptedData, iv } = await encryptRequest(formState.apiKey);
         const credential: Credential = { ...formState, apiKey: { encryptedData, iv } };
 
         await addCredential(credential);
