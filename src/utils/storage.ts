@@ -1,4 +1,4 @@
-import type { Credential } from "src/types";
+import type { Credential, SessionCredentialType } from "src/types";
 
 export async function getAllCredentials(): Promise<Credential[]> {
     const response = await chrome.storage.local.get<{ credentials: Credential[] }>("credentials");
@@ -45,4 +45,13 @@ export async function deleteCredential(id: string): Promise<Credential[]> {
     await chrome.storage.local.set<{ credentials: Credential[] }>({ credentials: newCredentials });
 
     return newCredentials;
+}
+
+export async function getSessionCredential(): Promise<SessionCredentialType | undefined> {
+    const response = await chrome.storage.session.get<{ credential: SessionCredentialType }>("credential");
+    return response.credential;
+}
+
+export function setSessionCredential(payload: SessionCredentialType): Promise<void> {
+    return chrome.storage.session.set<{ credential: typeof payload }>({ credential: payload });
 }

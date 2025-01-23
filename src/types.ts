@@ -18,3 +18,5 @@ export type ProviderPayload = {
 };
 
 export type SDKProviderPayload = Pick<ProviderPayload, "model" | "apiKey">;
+
+export type SessionCredentialType = SDKProviderPayload & { providerName: ProviderId };

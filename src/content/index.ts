@@ -5,8 +5,8 @@ import SpellingSVG from "../assets/svg/spelling.svg";
 import LoadingSVG from "../assets/svg/loading.svg";
 import CopySVG from "../assets/svg/copy.svg";
 import CheckSVG from "../assets/svg/check.svg";
-import type { EditableElement } from "src/types";
 import GroqCloud from "@src/providers/GroqCloud";
+import type { EditableElement, SessionCredentialType } from "src/types";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY as string;
 const provider = new GroqCloud({ model: "llama3-70b-8192", apiKey: GROQ_API_KEY });
@@ -34,6 +34,12 @@ const rephraseTones = [
 ];
 
 const buttons = ["accept", "discard", "try again"];
+
+const port = chrome.runtime.connect({ name: "CredentialPort" });
+
+port.onMessage.addListener((message: SessionCredentialType | undefined) => {
+    console.log(message);
+});
 
 const html = `
 <div class="${styles.container}">
