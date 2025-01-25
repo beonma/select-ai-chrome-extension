@@ -5,11 +5,11 @@ import SpellingSVG from "../assets/svg/spelling.svg";
 import LoadingSVG from "../assets/svg/loading.svg";
 import CopySVG from "../assets/svg/copy.svg";
 import CheckSVG from "../assets/svg/check.svg";
-import GroqCloud from "@src/providers/GroqCloud";
 import type { EditableElement, SessionCredentialType } from "src/types";
+import Provider from "@src/providers/Provider";
+import getProvider from "@src/providers/getProvider";
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY as string;
-const provider = new GroqCloud({ model: "llama3-70b-8192", apiKey: GROQ_API_KEY });
+let provider: InstanceType<typeof Provider> | undefined = undefined;
 
 let selectionTimeoutDOM: ReturnType<typeof setTimeout>;
 let selectionTimeoutInput: ReturnType<typeof setTimeout>;
@@ -38,7 +38,11 @@ const buttons = ["accept", "discard", "try again"];
 const port = chrome.runtime.connect({ name: "CredentialPort" });
 
 port.onMessage.addListener((message: SessionCredentialType | undefined) => {
-    console.log(message);
+    if (typeof message === "undefined") {
+        return;
+    }
+
+    provider = getProvider(message);
 });
 
 const html = `
@@ -191,6 +195,10 @@ async function generateRephrase(this: HTMLButtonElement, isRetry: boolean) {
     contentParagraph.innerHTML = "";
 
     try {
+        if (typeof provider === "undefined") {
+            throw new Error();
+        }
+
         const result = provider.rephrase(selectionRef.text, rephraseSelect.value);
 
         for await (const chunk of result) {
@@ -214,6 +222,10 @@ async function generateSpellingFix(this: HTMLButtonElement) {
     contentParagraph.innerHTML = "";
 
     try {
+        if (typeof provider === "undefined") {
+            throw new Error();
+        }
+
         const result = provider.fixSpelling(selectionRef.text);
 
         for await (const chunk of result) {

@@ -110,7 +110,8 @@ const AddModel = (_props: Props): React.JSX.Element => {
                 />
                 <div className="flex gap-2">
                     <Button onClick={onFormSubmitHandler}>save</Button>
-                    <Button variant="outline">Test connection</Button>
+                    {/* TODO add test connection */}
+                    {/* {<Button variant="outline">Test connection</Button>} */}
                 </div>
             </div>
         </React.Fragment>
