@@ -30,6 +30,8 @@ const AddModel = (_props: Props): React.JSX.Element => {
         isDefault: false,
     });
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     function onProviderChangeHandler(value: string) {
         setFormState(prev => ({
             ...prev,
@@ -49,11 +51,16 @@ const AddModel = (_props: Props): React.JSX.Element => {
             return;
         }
 
-        const { encryptedData, iv } = await encryptRequest(formState.apiKey);
-        const credential: Credential = { ...formState, apiKey: { encryptedData, iv } };
+        try {
+            setIsSubmitting(true);
+            const { encryptedData, iv } = await encryptRequest(formState.apiKey);
+            const credential: Credential = { ...formState, apiKey: { encryptedData, iv } };
 
-        await addCredential(credential);
-        navigate("/");
+            await addCredential(credential);
+            navigate("/");
+        } catch {
+            setIsSubmitting(false);
+        }
     }
 
     return (
@@ -64,7 +71,7 @@ const AddModel = (_props: Props): React.JSX.Element => {
                     strokeWidth={3}
                     className="text-primary cursor-pointer"
                     onClick={() => {
-                        navigate("/");
+                        isSubmitting || navigate("/");
                     }}
                 />
                 <h1 className="text-2xl font-poppinsSemiBold">Add Model</h1>
@@ -109,7 +116,9 @@ const AddModel = (_props: Props): React.JSX.Element => {
                     type="password"
                 />
                 <div className="flex gap-2">
-                    <Button onClick={onFormSubmitHandler}>save</Button>
+                    <Button disabled={isSubmitting} onClick={onFormSubmitHandler}>
+                        save
+                    </Button>
                     {/* TODO add test connection */}
                     {/* {<Button variant="outline">Test connection</Button>} */}
                 </div>
