@@ -33,7 +33,7 @@ const Model = ({ credential, ...props }: Props) => {
                 {!credential.isDefault && (
                     <Button
                         onClick={setDefaultModel}
-                        className="animate-fadeIn-1 text-xs mr-1 px-2 py-1"
+                        className="animate-fadeIn-1 text-xs rounded-xs mr-1 px-2 py-1"
                         variant="outline">
                         set default
                     </Button>

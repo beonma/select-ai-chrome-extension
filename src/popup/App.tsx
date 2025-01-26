@@ -2,6 +2,7 @@ import React from "react";
 import Home from "./pages/Home";
 import AddModel from "./pages/AddModel";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
 
 type Props = {
     children?: React.ReactNode;
@@ -16,6 +17,7 @@ const App = (_props: Props) => {
                     <Route path="/addModal" element={<AddModel />} />
                 </Routes>
             </MemoryRouter>
+            <Toaster />
         </div>
     );
 };

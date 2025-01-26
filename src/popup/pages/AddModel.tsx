@@ -9,6 +9,8 @@ import { addCredential } from "@src/utils/storage";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { encryptRequest } from "@src/utils/encryption";
+import { toast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 type Props = {
     children?: React.ReactNode;
@@ -57,6 +59,13 @@ const AddModel = (_props: Props): React.JSX.Element => {
             const credential: Credential = { ...formState, apiKey: { encryptedData, iv } };
 
             await addCredential(credential);
+
+            toast({
+                title: "New model added !",
+                description: "To start using this model, you should set it as default",
+                action: <ToastAction altText="Set as default">Set as default</ToastAction>,
+            });
+
             navigate("/");
         } catch {
             setIsSubmitting(false);

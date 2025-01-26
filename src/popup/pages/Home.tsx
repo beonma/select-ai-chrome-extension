@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAllCredentials } from "@src/utils/storage";
 import type { Credential } from "@src/types";
 import { Plus } from "lucide-react";
 import Model from "@/components/Model";
+import { toast } from "@/hooks/use-toast";
 
 type Props = {
     children?: React.ReactNode;
@@ -20,6 +21,10 @@ const Home = (_props: Props) => {
 
     function onCredentialsChangeHandler(credentials: Credential[]) {
         setCredentials(credentials);
+        toast({
+            title: "Models updated successfully !",
+            description: "please don't forget to refresh the page you are working on for changes to take effect",
+        });
     }
 
     return (
