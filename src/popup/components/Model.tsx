@@ -35,7 +35,7 @@ const Model = ({ credential, ...props }: Props) => {
                         onClick={setDefaultModel}
                         className="animate-fadeIn-1 text-xs rounded-xs mr-1 px-2 py-1"
                         variant="outline">
-                        set default
+                        Set default
                     </Button>
                 )}
                 <Button variant="outline" className="text-xs px-2 py-1" onClick={deleteModel}>

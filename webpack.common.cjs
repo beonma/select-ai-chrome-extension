@@ -1,18 +1,11 @@
 /** @type {import("webpack").Configuration} */
 
 const path = require("path");
-const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
-const Dotenv = require("dotenv-webpack");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-
-const mode = process.env.NODE_ENV || "development";
-const isDev = mode === "development";
 
 module.exports = {
-    mode,
     watchOptions: {
         ignored: /node_modules/,
     },
@@ -57,20 +50,6 @@ module.exports = {
             },
             { test: /\.svg$/, use: "svg-inline-loader" },
             {
-                test: /\.module\.css$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    {
-                        loader: "css-loader",
-                        options: {
-                            modules: {
-                                localIdentName: isDev ? "[path][name]__[local]" : "[hash:base64:6]__[local]",
-                            },
-                        },
-                    },
-                ],
-            },
-            {
                 test: /(?<!\.module)\.css$/,
                 use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
             },
@@ -79,9 +58,6 @@ module.exports = {
     plugins: [
         new MiniCssExtractPlugin({ filename: "[name].bundle.css" }),
         new CopyWebpackPlugin({ patterns: [{ from: "static" }] }),
-        new Dotenv({ safe: true, path: "./.env" }),
         new ForkTsCheckerWebpackPlugin(),
-        new BundleAnalyzerPlugin({ openAnalyzer: false }),
-        isDev && new webpack.SourceMapDevToolPlugin({ exclude: [/.vendor.bundle.js$/] }),
     ],
 };

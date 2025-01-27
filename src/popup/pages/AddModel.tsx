@@ -63,6 +63,7 @@ const AddModel = (_props: Props): React.JSX.Element => {
             toast({
                 title: "New model added !",
                 description: "To start using this model, you should set it as default",
+                // TODO add onClick handler, but need first to implement global state for credentials
                 action: <ToastAction altText="Set as default">Set as default</ToastAction>,
             });
 

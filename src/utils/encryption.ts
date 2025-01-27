@@ -1,5 +1,5 @@
 export async function encryptRequest(apiKey: string) {
-    const encryptionRequest = await fetch((process.env.WORKER_URL_DEV as string) + "/encrypt", {
+    const encryptionRequest = await fetch((process.env.WORKER_URL as string) + "/encrypt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: apiKey }),
@@ -11,7 +11,7 @@ export async function encryptRequest(apiKey: string) {
 }
 
 export async function decryptRequest({ encryptedData, iv }: { encryptedData: string; iv: string }) {
-    const encryptionRequest = await fetch((process.env.WORKER_URL_DEV as string) + "/decrypt", {
+    const encryptionRequest = await fetch((process.env.WORKER_URL as string) + "/decrypt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ encryptedData, iv }),
