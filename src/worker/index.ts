@@ -47,7 +47,7 @@ function setActionBadge(credentials: Credential[]) {
         chrome.action.setTitle({ title: "You don't have any model set !" });
     } else {
         chrome.action.setBadgeText({ text: "" });
-        chrome.action.setTitle({ title: "Select Ai" });
+        chrome.action.setTitle({ title: "SelectAI" });
     }
 }
 

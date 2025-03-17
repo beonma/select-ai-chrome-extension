@@ -1,5 +1,5 @@
 {
-    "name": "rephrase-me-extension",
+    "name": "select-ai",
     "version": "0.0.1",
     "main": "none",
     "type": "module",
@@ -12,12 +12,14 @@
         "chrome",
         "extension",
         "rephrase",
+        "text",
         "ai",
         "web"
     ],
     "author": "beonma",
-    "license": "ISC",
-    "description": "",
+    "license": "UNLICENSED",
+    "private": "true",
+    "description": "SelectAI is a free Chrome extension that lets you instantly transform text with AI. Choose your preferred LLM (like ChatGPT, Claude, or others) to rewrite, refine, or expand any selected text—effortlessly and at no cost.",
     "devDependencies": {
         "@babel/core": "^7.26.0",
         "@babel/preset-env": "^7.26.0",

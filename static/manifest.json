@@ -1,11 +1,11 @@
 {
     "manifest_version": 3,
-    "name": "RephraseMe",
+    "name": "SelectAI",
     "version": "0.0.1",
-    "description": "this extension rephrases what ever you give it to it",
+    "description": "Instantly rewrite, refine, or expand any selected text—effortlessly using your LLM provider of choice.",
     "action": {
         "default_popup": "popup.html",
-        "default_title": "RephraseMe"
+        "default_title": "SelectAI"
     },
     "icons": {
         "128": "icons/icon128.png"
