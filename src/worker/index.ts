@@ -6,7 +6,7 @@ chrome.runtime.onStartup.addListener(async () => {
     const credentials = await getAllCredentials();
 
     if (!credentials.length) {
-        setActionBadge([]);
+        setActionBadge("empty");
         return;
     }
 
@@ -19,7 +19,8 @@ chrome.runtime.onConnect.addListener(async port => {
 });
 
 chrome.storage.local.onChanged.addListener(async response => {
-    setActionBadge(response.credentials.newValue as Credential[]);
+    setActionBadge((response.credentials.newValue as Credential[]).length ? "default" : "empty");
+
     const { oldValue, newValue }: Partial<Record<keyof typeof response.credentials, Credential[]>> =
         response.credentials;
 
@@ -35,27 +36,34 @@ chrome.storage.local.onChanged.addListener(async response => {
     const tabs = await chrome.tabs.query({});
 
     for (const tab of tabs) {
-        setActionBadgeRefresh(tab.id);
+        setActionBadge("refresh", tab.id);
     }
 });
 
-function setActionBadge(credentials: Credential[]) {
-    if (!credentials.length) {
-        chrome.action.setBadgeText({ text: "!" });
-        chrome.action.setBadgeTextColor({ color: "white" });
-        chrome.action.setBadgeBackgroundColor({ color: "orange" });
-        chrome.action.setTitle({ title: "You don't have any model set !" });
-    } else {
-        chrome.action.setBadgeText({ text: "" });
-        chrome.action.setTitle({ title: "SelectAI" });
-    }
-}
+function setActionBadge(state: "refresh" | "empty" | "default", tabId?: number) {
+    switch (state) {
+        case "refresh":
+            chrome.action.setBadgeText({ text: "⟳", tabId });
+            chrome.action.setBadgeTextColor({ color: "white", tabId });
+            chrome.action.setBadgeBackgroundColor({ color: "#4f646f", tabId });
+            chrome.action.setTitle({ title: "Refresh the page for changes to take effect", tabId });
+            break;
 
-function setActionBadgeRefresh(tabId: number | undefined) {
-    chrome.action.setBadgeText({ text: "⟳", tabId });
-    chrome.action.setBadgeTextColor({ color: "white", tabId });
-    chrome.action.setBadgeBackgroundColor({ color: "#4f646f", tabId });
-    chrome.action.setTitle({ title: "Refresh the page for changes to take effect", tabId });
+        case "empty":
+            chrome.action.setBadgeText({ text: "!" });
+            chrome.action.setBadgeTextColor({ color: "white" });
+            chrome.action.setBadgeBackgroundColor({ color: "orange" });
+            chrome.action.setTitle({ title: "You don't have any model set !" });
+            break;
+
+        default:
+            if (state !== "default") {
+                console.error("Unknown badge state");
+            }
+
+            chrome.action.setBadgeText({ text: "" });
+            chrome.action.setTitle({ title: "SelectAI" });
+    }
 }
 
 async function updateSessionCredential(credentials: Credential[]) {
