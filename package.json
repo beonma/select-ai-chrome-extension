@@ -19,6 +19,10 @@
         "web"
     ],
     "author": "beonma",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/beonma/select-ai-chrome-extension.git"
+    },
     "license": "UNLICENSED",
     "private": "true",
     "description": "SelectAI is a free Chrome extension that lets you instantly transform text with AI. Choose your preferred LLM (like ChatGPT, Claude, or others) to rewrite, refine, or expand any selected text—effortlessly and at no cost.",

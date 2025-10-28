@@ -1,16 +1,8 @@
 import { SessionCredentialType } from "@src/types";
 import Provider from "./Provider";
-import GroqCloud from "./GroqCloud";
-import Google from "./Google";
-import Claude from "./Claude";
+import providers from "../providers/providers.json";
 
-export default function ({ providerName, model, apiKey }: SessionCredentialType): InstanceType<typeof Provider> {
-    switch (providerName) {
-        case "groq":
-            return new GroqCloud({ model, apiKey });
-        case "google":
-            return new Google({ model, apiKey });
-        case "anthropic":
-            return new Claude({ model, apiKey });
-    }
+export default function ({ model, apiKey, providerName }: SessionCredentialType): InstanceType<typeof Provider> {
+    const endpoint = providers[providerName].endpoint;
+    return new Provider({ apiKey, model, endpoint });
 }
