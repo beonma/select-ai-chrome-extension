@@ -14,7 +14,7 @@ export type Credential = {
 export type ProviderPayload = {
     model: string;
     apiKey: string;
-    host: string;
+    endpoint: string;
 };
 
 export type SDKProviderPayload = Pick<ProviderPayload, "model" | "apiKey">;

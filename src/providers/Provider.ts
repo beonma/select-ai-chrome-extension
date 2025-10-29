@@ -20,7 +20,6 @@ export default class Provider {
             },
             body: JSON.stringify({
                 messages: [{ role: "user", content: prompt }],
-                // model: "gemini-2.0-flash",
                 model: this.MODEL,
                 stream: true,
             }),

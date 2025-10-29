@@ -27,7 +27,7 @@ module.exports = merge(common, {
         ],
     },
     plugins: [
-        new BundleAnalyzerPlugin({ openAnalyzer: false }),
+        // new BundleAnalyzerPlugin({ openAnalyzer: false }),
         new webpack.SourceMapDevToolPlugin({ exclude: [/.vendor.bundle.js$/] }),
         new Dotenv({ safe: true, path: "./.env" }),
     ],
