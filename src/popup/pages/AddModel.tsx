@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { encryptRequest } from "@src/utils/encryption";
 import { toast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+import GeminiNano from "@/components/AddModel/GeminiNano";
 
 type Props = {
     children?: React.ReactNode;
@@ -97,17 +99,49 @@ const AddModel = (_props: Props): React.JSX.Element => {
                         onChange={onProviderChangeHandler}
                         value={formState.provider}
                     />
-                    {formState.provider !== "gemini-nano" && (
-                        <SelectField
-                            onChange={onModelChangeHandler}
-                            label="model"
-                            items={PROVIDERS[formState.provider].models.map(model => ({
-                                text: model,
-                                value: model,
-                            }))}
-                            value={formState.model}
-                        />
-                    )}
+                    <div className="flex-1">
+                        {formState.provider !== "gemini-nano" && (
+                            <SelectField
+                                onChange={onModelChangeHandler}
+                                label="model"
+                                items={PROVIDERS[formState.provider].models.map(model => ({
+                                    text: model,
+                                    value: model,
+                                }))}
+                                value={formState.model}
+                            />
+                        )}
+                    </div>
+                </div>
+                {formState.provider !== "gemini-nano" && (
+                    <InputField
+                        label="name"
+                        value={formState.name}
+                        onChange={e => {
+                            setFormState(prev => ({ ...prev, name: e.target.value }));
+                        }}
+                        placeholder="give it a name"
+                        type="text"
+                    />
+                )}
+                {formState.provider !== "gemini-nano" && (
+                    <InputField
+                        label="API key"
+                        value={formState.apiKey}
+                        onChange={e => {
+                            setFormState(prev => ({ ...prev, apiKey: e.target.value }));
+                        }}
+                        placeholder="your api key here"
+                        type="password"
+                    />
+                )}
+                {formState.provider === "gemini-nano" && <GeminiNano />}
+                <div className="flex gap-2">
+                    <Button disabled={isSubmitting} onClick={onFormSubmitHandler}>
+                        save
+                    </Button>
+                    {/* TODO add test connection */}
+                    {/* {<Button variant="outline">Test connection</Button>} */}
                 </div>
                 {formState.provider !== "gemini-nano" ? (
                     <React.Fragment>
