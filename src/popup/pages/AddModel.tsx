@@ -11,13 +11,13 @@ import { ChevronLeft } from "lucide-react";
 import { encryptRequest } from "@src/utils/encryption";
 import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import GeminiNano from "@/components/AddModel/GeminiNano";
+import GeminiNano, { GEMINI_NANO_MODELS } from "@/components/AddModel/GeminiNano";
 
 type Props = {
     children?: React.ReactNode;
 };
 
-type FormState = Omit<Credential, "apiKey"> & { apiKey: string };
+type FormState = Omit<Credential, "apiKey"> & { apiKey?: string };
 
 const providersList = Object.keys(PROVIDERS) as ProviderId[];
 
@@ -50,16 +50,35 @@ const AddModel = (_props: Props): React.JSX.Element => {
 
     // COMMENT odd function behavior when run on debugger
     async function onFormSubmitHandler() {
-        if ((Object.keys(formState) as (keyof Credential)[]).some(input => formState[input] === "")) {
-            return;
-        }
+        const formData = { ...formState };
 
         try {
             setIsSubmitting(true);
-            const { encryptedData, iv } = await encryptRequest(formState.apiKey);
-            const credential: Credential = { ...formState, apiKey: { encryptedData, iv } };
 
-            await addCredential(credential);
+            if (formData.provider === "gemini-nano") {
+                delete formData.apiKey;
+                formData.name = "Gemini Nano";
+                formData.model = "build-in browser AI";
+
+                const checkAvailability = await Promise.all(
+                    GEMINI_NANO_MODELS.map(model => window[model.objectKey]?.availability()),
+                );
+
+                if (checkAvailability.some(el => el !== "available")) {
+                    throw new Error("You must have all required models for built-in browser AI before proceeding.");
+                }
+
+                await addCredential(formData as Credential);
+            } else {
+                if ((Object.keys(formData) as (keyof Credential)[]).some(input => formData[input] === "")) {
+                    throw new Error("All fields must be filled to register the model.");
+                }
+
+                const { encryptedData, iv } = await encryptRequest(formData.apiKey!);
+                const credential: Credential = { ...formData, apiKey: { encryptedData, iv } };
+
+                await addCredential(credential);
+            }
 
             toast({
                 title: "New model added !",
@@ -70,7 +89,21 @@ const AddModel = (_props: Props): React.JSX.Element => {
             });
 
             navigate("/");
-        } catch {
+        } catch (e) {
+            let errorMessage: string = "";
+            if (typeof e === "string") {
+                errorMessage = e;
+            }
+
+            if (e instanceof Error) {
+                errorMessage = e.message;
+            }
+
+            toast({
+                title: "Error !",
+                description: errorMessage,
+            });
+
             setIsSubmitting(false);
         }
     }

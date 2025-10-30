@@ -11,17 +11,20 @@ const ModelBadge = (props: Props) => {
     const [availability, setAvailability] = useState<AvailabilityStatus>("unavailable");
     useEffect(() => {
         (async () => {
-            //TODO enhance type checking, window is currently on any
-            const availability = (await (window as any)[props.model.objectKey].availability()) ?? "unavailable";
+            const availability = (await window[props.model.objectKey]?.availability()) ?? "unavailable";
             setAvailability(availability);
         })();
     }, []);
 
     async function downloadModel() {
-        //TODO enhance type checking, window is currently on any
-        const rewriter = await (window as any)[props.model.objectKey]?.create({});
-        setAvailability("downloading");
-        rewriter?.destroy();
+        const rewriter = await window[props.model.objectKey]?.create({});
+
+        if (rewriter) {
+            setAvailability("downloading");
+            // TODO solve typecheck
+            //@ts-ignore
+            rewriter?.destroy();
+        }
     }
 
     return (

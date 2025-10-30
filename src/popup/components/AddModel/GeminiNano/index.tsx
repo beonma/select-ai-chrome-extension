@@ -7,7 +7,7 @@ export const GEMINI_NANO_MODELS = [
     { name: "Rewriter", objectKey: "Rewriter" },
     { name: "Writer", objectKey: "Writer" },
     { name: "Summarizer", objectKey: "Summarizer" },
-    { name: "Prompt", objectKey: "LanguageModal" },
+    { name: "Prompt", objectKey: "LanguageModel" },
     { name: "Language Detector", objectKey: "LanguageDetector" },
 ] as const;
 

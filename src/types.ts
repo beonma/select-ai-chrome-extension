@@ -16,9 +16,9 @@ declare global {
                       format?: "as-is" | "markdown" | "plain-text";
                       length?: "as-is" | "shorter" | "longer";
                       sharedContext?: string;
-                      expectedInputLanguages: string[];
-                      expectedContextLanguages: string[];
-                      outputLanguage: string;
+                      expectedInputLanguages?: string[];
+                      expectedContextLanguages?: string[];
+                      outputLanguage?: string;
                   }) => Promise<{
                       rewrite: (
                           content: string,
@@ -67,7 +67,7 @@ export type Credential = {
     name: string;
     provider: ProviderId;
     model: string;
-    apiKey: { encryptedData: string; iv: string };
+    apiKey?: { encryptedData: string; iv: string };
     isDefault: boolean;
 };
 

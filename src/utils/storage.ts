@@ -52,6 +52,6 @@ export async function getSessionCredential(): Promise<SessionCredentialType | un
     return response.credential;
 }
 
-export function setSessionCredential(payload: SessionCredentialType): Promise<void> {
+export function setSessionCredential<T>(payload: T): Promise<void> {
     return chrome.storage.session.set<{ credential: typeof payload }>({ credential: payload });
 }
