@@ -196,7 +196,7 @@ async function generateRephrase(this: HTMLButtonElement, isRetry: boolean) {
 
     try {
         if (typeof provider === "undefined") {
-            throw new Error();
+            throw new Error("couldn't initialize a provider.");
         }
 
         const result = provider.rephrase(selectionRef.text, rephraseSelect.value);
@@ -209,7 +209,11 @@ async function generateRephrase(this: HTMLButtonElement, isRetry: boolean) {
     } catch (e) {
         console.error(e);
         content.style.display = "block";
-        contentParagraph.textContent = "Oops ! something went wrong.";
+        if (e instanceof Error) {
+            contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e.message;
+        } else {
+            contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e;
+        }
     } finally {
         this.removeAttribute("style");
         this.innerHTML = "rephrase" + RephraseSVG;
@@ -223,7 +227,7 @@ async function generateSpellingFix(this: HTMLButtonElement) {
 
     try {
         if (typeof provider === "undefined") {
-            throw new Error();
+            throw new Error("couldn't initialize a provider.");
         }
 
         const result = provider.fixSpelling(selectionRef.text);
@@ -236,7 +240,11 @@ async function generateSpellingFix(this: HTMLButtonElement) {
     } catch (e) {
         console.error(e);
         content.style.display = "block";
-        contentParagraph.textContent = "Oops ! something went wrong.";
+        if (e instanceof Error) {
+            contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e.message;
+        } else {
+            contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e;
+        }
     } finally {
         this.innerHTML = "fix spelling" + SpellingSVG;
     }

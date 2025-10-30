@@ -28,11 +28,17 @@ export default class RESTProvider extends Provider {
         });
 
         if (!response.ok) {
-            throw new Error("request failed");
+            const errorObj: GroqErrorObject | GoogleErrorObject = await response.json();
+
+            if (Array.isArray(errorObj)) {
+                throw new Error(errorObj[0].error.message);
+            }
+
+            throw new Error(errorObj.error.message);
         }
 
         if (response.body === null) {
-            throw new Error("response body is null");
+            throw new Error("response body is null.");
         }
 
         const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
@@ -84,3 +90,19 @@ interface StreamResponse {
     model: string;
     object: "chat.completion.chunk";
 }
+
+type GroqErrorObject = {
+    error: {
+        code: string;
+        message: string;
+        type: string;
+    };
+};
+
+type GoogleErrorObject = {
+    error: {
+        code: number;
+        message: string;
+        status: string;
+    };
+}[];
