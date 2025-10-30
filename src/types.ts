@@ -27,7 +27,7 @@ declare global {
                       rewriteStreaming: (
                           content: string,
                           { context, signal }?: { signal?: AbortController; context?: string },
-                      ) => string;
+                      ) => AsyncGenerator<string>;
                       destroy: () => void;
                   }>;
                   availability: () => Promise<AvailabilityStatus>;
@@ -47,7 +47,23 @@ declare global {
             | undefined;
         LanguageModel:
             | {
-                  create: ({ test, bo }: { test?: string; bo?: number }) => Promise<string>;
+                  create: ({
+                      test,
+                      bo,
+                  }: {
+                      test?: string;
+                      bo?: number;
+                  }) => Promise<{
+                      prompt: (
+                          content: string,
+                          { context, signal }?: { signal?: AbortController; context?: string },
+                      ) => Promise<string>;
+                      promptStreaming: (
+                          content: string,
+                          { context, signal }?: { signal?: AbortController; context?: string },
+                      ) => AsyncGenerator<string>;
+                      destroy: () => void;
+                  }>;
                   availability: () => Promise<AvailabilityStatus>;
               }
             | undefined;
