@@ -22,17 +22,17 @@ let selectionRef: {
     text: string;
 };
 
-// const rephraseTones = [
-//     "formal",
-//     "informal",
-//     "friendly",
-//     "persuasive",
-//     "neutral",
-//     "assertive",
-//     "apologetic",
-//     "humorous",
-//     "sympathetic",
-// ];
+const rephraseTones = [
+    "formal",
+    "informal",
+    "friendly",
+    "persuasive",
+    "neutral",
+    "assertive",
+    "apologetic",
+    "humorous",
+    "sympathetic",
+];
 
 const buttons = ["accept", "discard"];
 
@@ -49,21 +49,25 @@ port.onMessage.addListener((message: SessionCredentialType | undefined) => {
 const html = `
 <div class="${styles.container}">
     <div class="${styles.toolbar}">
-        <button class="${styles.btn}">rephrase
-            ${RephraseSVG}
-        </button>
-        <button class="${styles.btn}">proof read
-            ${CheckSVG}
-        </button>
-        <button class="${styles.btn}">fix spelling
-            ${SpellingSVG}
-        </button>
-        <button class="${styles.btn}">summarize
-            ${SummarizeSVG}
-        </button>
-        <button class="${styles.btn}">explain
-            ${ExplainSVG}
-        </button>
+        <div class="${styles["top-bar"]}">
+            <button class="${styles.btn}">rephrase
+                ${RephraseSVG}
+            </button>
+            <button class="${styles.btn}">proof read
+                ${CheckSVG}
+            </button>
+            <button class="${styles.btn}">fix spelling
+                ${SpellingSVG}
+            </button>
+            <button class="${styles.btn}">summarize
+                ${SummarizeSVG}
+            </button>
+            <button class="${styles.btn}">explain
+                ${ExplainSVG}
+            </button>
+        </div><div class="${styles["rephrase-bar"]}">
+            ${rephraseTones.map(tone => '<button class="' + styles.btn + '">' + tone + "</button>").join("")}
+        </div>
     </div>
     <div class="${styles.content}">
         <p></p>
@@ -80,14 +84,31 @@ const html = `
 document.querySelector("body")?.insertAdjacentHTML("afterbegin", html);
 
 const htmlNode = <HTMLElement>document.querySelector(`.${styles.container}`);
+const topToolbar = <HTMLDivElement>htmlNode.querySelector(`.${styles.toolbar} .${styles["top-bar"]}`);
+const rephraseToolbar = <HTMLDivElement>htmlNode.querySelector(`.${styles.toolbar} .${styles["rephrase-bar"]}`);
+
 const editableElements: NodeListOf<HTMLTextAreaElement | HTMLInputElement> =
     document.querySelectorAll("input, textarea");
 
-const rephraseBtn = <HTMLButtonElement>htmlNode.querySelector(`.${styles.toolbar} button:first-child`);
-const proofReadBtn = <HTMLButtonElement>htmlNode.querySelector(`.${styles.toolbar} button:nth-child(2)`);
-const fixSpellingBtn = <HTMLButtonElement>htmlNode.querySelector(`.${styles.toolbar} button:nth-child(3)`);
-const summarizeBtn = <HTMLButtonElement>htmlNode.querySelector(`.${styles.toolbar} button:nth-child(4)`);
-const explainBtn = <HTMLButtonElement>htmlNode.querySelector(`.${styles.toolbar} button:nth-child(5)`);
+const rephraseSubBtns = <NodeListOf<HTMLButtonElement>>(
+    htmlNode.querySelectorAll(`.${styles.toolbar} .${styles["rephrase-bar"]} button`)
+);
+
+const rephraseBtn = <HTMLButtonElement>(
+    htmlNode.querySelector(`.${styles.toolbar} .${styles["top-bar"]} button:first-child`)
+);
+const proofReadBtn = <HTMLButtonElement>(
+    htmlNode.querySelector(`.${styles.toolbar} .${styles["top-bar"]} button:nth-child(2)`)
+);
+const fixSpellingBtn = <HTMLButtonElement>(
+    htmlNode.querySelector(`.${styles.toolbar} .${styles["top-bar"]} button:nth-child(3)`)
+);
+const summarizeBtn = <HTMLButtonElement>(
+    htmlNode.querySelector(`.${styles.toolbar} .${styles["top-bar"]} button:nth-child(4)`)
+);
+const explainBtn = <HTMLButtonElement>(
+    htmlNode.querySelector(`.${styles.toolbar} .${styles["top-bar"]} button:nth-child(5)`)
+);
 
 const content = <HTMLDivElement>htmlNode.querySelector(`.${styles.content}`);
 const contentParagraph = <HTMLParagraphElement>content.querySelector("p");
@@ -156,11 +177,15 @@ document.addEventListener("selectionchange", () => {
     showOnSelectionChange(range, parentElement);
 });
 
-rephraseBtn.addEventListener("click", generateRephrase);
+rephraseBtn.addEventListener("click", onRephraseClick);
 proofReadBtn.addEventListener("click", generateProofRead);
 fixSpellingBtn.addEventListener("click", generateFixSpelling);
 summarizeBtn.addEventListener("click", generateSummarize);
 explainBtn.addEventListener("click", generateExplain);
+
+rephraseSubBtns.forEach(el => {
+    el.addEventListener("click", generateRephrase);
+});
 
 acceptButton.addEventListener("click", () => {
     const parentElement = selectionRef.parent;
@@ -186,9 +211,16 @@ copyButton.addEventListener("click", async () => {
     }
 });
 
+function onRephraseClick() {
+    topToolbar.style.display = "none";
+    rephraseToolbar.style.display = "flex";
+}
+
 async function generateRephrase(this: HTMLButtonElement) {
     const prevElementHTML = this.innerHTML;
+    const tone = this.textContent;
 
+    this.style.setProperty("padding", "6px 8px", "important");
     this.innerHTML = LoadingSVG;
     content.style.display = "block";
     contentParagraph.innerHTML = "";
@@ -198,7 +230,7 @@ async function generateRephrase(this: HTMLButtonElement) {
             throw new Error("couldn't initialize a provider.");
         }
 
-        const result = provider.rephrase(selectionRef.text, "formal");
+        const result = provider.rephrase(selectionRef.text, tone);
 
         for await (const chunk of result) {
             const spanElement = document.createElement("span");
@@ -214,9 +246,11 @@ async function generateRephrase(this: HTMLButtonElement) {
             contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e;
         }
     } finally {
+        this.style.setProperty("padding", "13px 8px", "important");
         this.innerHTML = prevElementHTML;
     }
 }
+
 async function generateFixSpelling(this: HTMLButtonElement) {
     const prevElementHTML = this.innerHTML;
 
@@ -248,6 +282,7 @@ async function generateFixSpelling(this: HTMLButtonElement) {
         this.innerHTML = prevElementHTML;
     }
 }
+
 async function generateProofRead(this: HTMLButtonElement) {
     const prevElementHTML = this.innerHTML;
 
@@ -279,6 +314,7 @@ async function generateProofRead(this: HTMLButtonElement) {
         this.innerHTML = prevElementHTML;
     }
 }
+
 async function generateSummarize(this: HTMLButtonElement) {
     const prevElementHTML = this.innerHTML;
 
@@ -310,6 +346,7 @@ async function generateSummarize(this: HTMLButtonElement) {
         this.innerHTML = prevElementHTML;
     }
 }
+
 async function generateExplain(this: HTMLButtonElement) {
     const prevElementHTML = this.innerHTML;
 
@@ -344,6 +381,8 @@ async function generateExplain(this: HTMLButtonElement) {
 
 function hideToolbar() {
     htmlNode.style.display = "none";
+    topToolbar.style.display = "flex";
+    rephraseToolbar.style.display = "none";
     content.style.display = "none";
     contentParagraph.innerHTML = "";
 }

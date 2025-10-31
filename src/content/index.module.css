@@ -36,8 +36,15 @@
     }
 }
 
-.toolbar {
+.toolbar .top-bar {
     display: flex;
+    padding: 4px;
+    gap: 2px;
+    align-items: center;
+}
+
+.toolbar .rephrase-bar {
+    display: none;
     padding: 4px;
     gap: 2px;
     align-items: center;
@@ -64,6 +71,11 @@
     align-items: center;
     gap: 6px;
     line-height: 0;
+    border-width: 0px !important;
+}
+
+.toolbar .rephrase-bar .btn {
+    padding: 13px 8px !important;
 }
 
 .btn path {
