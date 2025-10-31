@@ -12,7 +12,7 @@ declare global {
                       length,
                       sharedContext,
                   }: {
-                      tone?: string;
+                      tone?: "as-is" | "more-formal" | "more-casual";
                       format?: "as-is" | "markdown" | "plain-text";
                       length?: "as-is" | "shorter" | "longer";
                       sharedContext?: string;
@@ -41,22 +41,64 @@ declare global {
             | undefined;
         Summarizer:
             | {
-                  create: ({ test, bo }: { test?: string; bo?: number }) => Promise<string>;
+                  create: ({
+                      format,
+                      length,
+                      sharedContext,
+                      type,
+                      outputLanguage,
+                      expectedContextLanguages,
+                      expectedInputLanguages,
+                  }?: {
+                      format?: "markdown" | "plain-text";
+                      length?: "medium" | "short" | "long";
+                      sharedContext?: string;
+                      type?: "tldr" | "key-points" | "teaser" | "headline";
+                      expectedInputLanguages?: string[];
+                      expectedContextLanguages?: string[];
+                      outputLanguage?: string;
+                  }) => Promise<{
+                      summarize: (
+                          text: string,
+                          { context, signal }?: { context?: string; signal?: AbortController },
+                      ) => Promise<string>;
+                      summarizeStreaming: (
+                          text: string,
+                          { context, signal }?: { context?: string; signal?: AbortController },
+                      ) => AsyncGenerator<string>;
+                      destroy: () => void;
+                  }>;
                   availability: () => Promise<AvailabilityStatus>;
               }
             | undefined;
         LanguageModel:
             | {
                   create: ({
-                      test,
-                      bo,
-                  }: {
-                      test?: string;
-                      bo?: number;
+                      temperature,
+                      topK,
+                      initialPrompts,
+                      expectedInputs,
+                      expectedOutputs,
+                  }?: {
+                      temperature?: number;
+                      topK?: number;
+                      initialPrompts?: { role: "system" | "user" | "assistant"; content: string }[];
+                      expectedInputs?: { type: "text"; languages: string[] }[];
+                      expectedOutputs?: { type: "text"; languages: string[] }[];
                   }) => Promise<{
                       prompt: (
                           content: string,
-                          { context, signal }?: { signal?: AbortController; context?: string },
+                          {
+                              context,
+                              signal,
+                              responseConstraint,
+                              omitResponseConstraintInput,
+                          }?: {
+                              signal?: AbortController;
+                              context?: string;
+                              responseConstraint?: Record<string, unknown>;
+                              omitResponseConstraintInput?: boolean;
+                          },
                       ) => Promise<string>;
                       promptStreaming: (
                           content: string,

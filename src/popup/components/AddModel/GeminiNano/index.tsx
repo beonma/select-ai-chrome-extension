@@ -8,7 +8,7 @@ export const GEMINI_NANO_MODELS = [
     { name: "Writer", objectKey: "Writer" },
     { name: "Summarizer", objectKey: "Summarizer" },
     { name: "Prompt", objectKey: "LanguageModel" },
-    { name: "Language Detector", objectKey: "LanguageDetector" },
+    // { name: "Language Detector", objectKey: "LanguageDetector" },
 ] as const;
 
 export default function (_props: Props): JSX.Element {
