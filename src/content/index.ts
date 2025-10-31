@@ -1,10 +1,11 @@
 import * as styles from "./index.module.css";
 import RephraseSVG from "../assets/svg/rephrase.svg";
-import CaretSVG from "../assets/svg/caret.svg";
 import SpellingSVG from "../assets/svg/spelling.svg";
 import LoadingSVG from "../assets/svg/loading.svg";
 import CopySVG from "../assets/svg/copy.svg";
 import CheckSVG from "../assets/svg/check.svg";
+import SummarizeSVG from "../assets/svg/summarize.svg";
+import ExplainSVG from "../assets/svg/explain.svg";
 import type { EditableElement, SessionCredentialType } from "src/types";
 import Provider from "@src/providers/Provider";
 import getProvider from "@src/providers/getProvider";
@@ -21,19 +22,19 @@ let selectionRef: {
     text: string;
 };
 
-const rephraseTones = [
-    "formal",
-    "informal",
-    "friendly",
-    "persuasive",
-    "neutral",
-    "assertive",
-    "apologetic",
-    "humorous",
-    "sympathetic",
-];
+// const rephraseTones = [
+//     "formal",
+//     "informal",
+//     "friendly",
+//     "persuasive",
+//     "neutral",
+//     "assertive",
+//     "apologetic",
+//     "humorous",
+//     "sympathetic",
+// ];
 
-const buttons = ["accept", "discard", "try again"];
+const buttons = ["accept", "discard"];
 
 const port = chrome.runtime.connect({ name: "CredentialPort" });
 
@@ -51,16 +52,17 @@ const html = `
         <button class="${styles.btn}">rephrase
             ${RephraseSVG}
         </button>
-        <div class="${styles.select__container}">
-            <select id="rephrase-tone">
-                ${rephraseTones.map(tone => `<option value="${tone}">${tone}</option>`).join("")}
-            </select>
-            <span class="${styles.select__caret}">
-                ${CaretSVG}
-            </span>
-        </div>
+        <button class="${styles.btn}">proof read
+            ${CheckSVG}
+        </button>
         <button class="${styles.btn}">fix spelling
             ${SpellingSVG}
+        </button>
+        <button class="${styles.btn}">summarize
+            ${SummarizeSVG}
+        </button>
+        <button class="${styles.btn}">explain
+            ${ExplainSVG}
         </button>
     </div>
     <div class="${styles.content}">
@@ -69,7 +71,7 @@ const html = `
             <div class="${styles.action__btns_left_container}">
                 ${buttons.map(btn => `<button class="${styles.btn}">${btn}</button>`).join("")}
             </div>
-            <button class="${styles.btn} ${styles.copyBtn}">${CopySVG}</button>
+            <button class="${styles.btn} ${styles.copyBtn}">copy & close${CopySVG}</button>
         </div>
     </div>
 </div>
@@ -82,15 +84,16 @@ const editableElements: NodeListOf<HTMLTextAreaElement | HTMLInputElement> =
     document.querySelectorAll("input, textarea");
 
 const rephraseBtn = <HTMLButtonElement>htmlNode.querySelector(`.${styles.toolbar} button:first-child`);
-const fixSpellingBtn = <HTMLButtonElement>htmlNode.querySelector(`.${styles.toolbar} button:last-child`);
-const rephraseSelect = <HTMLSelectElement>htmlNode.querySelector(`.${styles.toolbar} select`);
+const proofReadBtn = <HTMLButtonElement>htmlNode.querySelector(`.${styles.toolbar} button:nth-child(2)`);
+const fixSpellingBtn = <HTMLButtonElement>htmlNode.querySelector(`.${styles.toolbar} button:nth-child(3)`);
+const summarizeBtn = <HTMLButtonElement>htmlNode.querySelector(`.${styles.toolbar} button:nth-child(4)`);
+const explainBtn = <HTMLButtonElement>htmlNode.querySelector(`.${styles.toolbar} button:nth-child(5)`);
 
 const content = <HTMLDivElement>htmlNode.querySelector(`.${styles.content}`);
 const contentParagraph = <HTMLParagraphElement>content.querySelector("p");
 
 const acceptButton = <HTMLButtonElement>content.querySelector(`.${styles.action__container} div button:first-child`);
 const discardButton = <HTMLButtonElement>content.querySelector(`.${styles.action__container} div button:nth-child(2)`);
-const tryAgainButton = <HTMLButtonElement>content.querySelector(`.${styles.action__container} div button:last-child`);
 const copyButton = <HTMLButtonElement>content.querySelector(`.${styles.action__container} > button`);
 
 document.addEventListener("click", event => {
@@ -153,8 +156,11 @@ document.addEventListener("selectionchange", () => {
     showOnSelectionChange(range, parentElement);
 });
 
-rephraseBtn.addEventListener("click", generateRephrase.bind(rephraseBtn, false));
-fixSpellingBtn.addEventListener("click", generateSpellingFix);
+rephraseBtn.addEventListener("click", generateRephrase);
+proofReadBtn.addEventListener("click", generateProofRead);
+fixSpellingBtn.addEventListener("click", generateFixSpelling);
+summarizeBtn.addEventListener("click", generateSummarize);
+explainBtn.addEventListener("click", generateExplain);
 
 acceptButton.addEventListener("click", () => {
     const parentElement = selectionRef.parent;
@@ -173,22 +179,15 @@ acceptButton.addEventListener("click", () => {
 });
 
 discardButton.addEventListener("click", hideToolbar);
-tryAgainButton.addEventListener("click", generateRephrase.bind(rephraseBtn, true));
 copyButton.addEventListener("click", async () => {
     if (contentParagraph.textContent) {
         await navigator.clipboard.writeText(contentParagraph.textContent);
-        copyButton.innerHTML = CheckSVG;
-
-        setTimeout(() => {
-            copyButton.innerHTML = CopySVG;
-        }, 3000);
+        hideToolbar();
     }
 });
 
-async function generateRephrase(this: HTMLButtonElement, isRetry: boolean) {
-    if (isRetry) {
-        this.style.backgroundColor = "#4f646f";
-    }
+async function generateRephrase(this: HTMLButtonElement) {
+    const prevElementHTML = this.innerHTML;
 
     this.innerHTML = LoadingSVG;
     content.style.display = "block";
@@ -199,7 +198,7 @@ async function generateRephrase(this: HTMLButtonElement, isRetry: boolean) {
             throw new Error("couldn't initialize a provider.");
         }
 
-        const result = provider.rephrase(selectionRef.text, rephraseSelect.value);
+        const result = provider.rephrase(selectionRef.text, "formal");
 
         for await (const chunk of result) {
             const spanElement = document.createElement("span");
@@ -215,12 +214,12 @@ async function generateRephrase(this: HTMLButtonElement, isRetry: boolean) {
             contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e;
         }
     } finally {
-        this.removeAttribute("style");
-        this.innerHTML = "rephrase" + RephraseSVG;
+        this.innerHTML = prevElementHTML;
     }
 }
+async function generateFixSpelling(this: HTMLButtonElement) {
+    const prevElementHTML = this.innerHTML;
 
-async function generateSpellingFix(this: HTMLButtonElement) {
     this.innerHTML = LoadingSVG;
     content.style.display = "block";
     contentParagraph.innerHTML = "";
@@ -246,7 +245,100 @@ async function generateSpellingFix(this: HTMLButtonElement) {
             contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e;
         }
     } finally {
-        this.innerHTML = "fix spelling" + SpellingSVG;
+        this.innerHTML = prevElementHTML;
+    }
+}
+async function generateProofRead(this: HTMLButtonElement) {
+    const prevElementHTML = this.innerHTML;
+
+    this.innerHTML = LoadingSVG;
+    content.style.display = "block";
+    contentParagraph.innerHTML = "";
+
+    try {
+        if (typeof provider === "undefined") {
+            throw new Error("couldn't initialize a provider.");
+        }
+
+        const result = provider.explain(selectionRef.text);
+
+        for await (const chunk of result) {
+            const spanElement = document.createElement("span");
+            spanElement.textContent = chunk;
+            contentParagraph.insertAdjacentElement("beforeend", spanElement);
+        }
+    } catch (e) {
+        console.error(e);
+        content.style.display = "block";
+        if (e instanceof Error) {
+            contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e.message;
+        } else {
+            contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e;
+        }
+    } finally {
+        this.innerHTML = prevElementHTML;
+    }
+}
+async function generateSummarize(this: HTMLButtonElement) {
+    const prevElementHTML = this.innerHTML;
+
+    this.innerHTML = LoadingSVG;
+    content.style.display = "block";
+    contentParagraph.innerHTML = "";
+
+    try {
+        if (typeof provider === "undefined") {
+            throw new Error("couldn't initialize a provider.");
+        }
+
+        const result = provider.explain(selectionRef.text);
+
+        for await (const chunk of result) {
+            const spanElement = document.createElement("span");
+            spanElement.textContent = chunk;
+            contentParagraph.insertAdjacentElement("beforeend", spanElement);
+        }
+    } catch (e) {
+        console.error(e);
+        content.style.display = "block";
+        if (e instanceof Error) {
+            contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e.message;
+        } else {
+            contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e;
+        }
+    } finally {
+        this.innerHTML = prevElementHTML;
+    }
+}
+async function generateExplain(this: HTMLButtonElement) {
+    const prevElementHTML = this.innerHTML;
+
+    this.innerHTML = LoadingSVG;
+    content.style.display = "block";
+    contentParagraph.innerHTML = "";
+
+    try {
+        if (typeof provider === "undefined") {
+            throw new Error("couldn't initialize a provider.");
+        }
+
+        const result = provider.explain(selectionRef.text);
+
+        for await (const chunk of result) {
+            const spanElement = document.createElement("span");
+            spanElement.textContent = chunk;
+            contentParagraph.insertAdjacentElement("beforeend", spanElement);
+        }
+    } catch (e) {
+        console.error(e);
+        content.style.display = "block";
+        if (e instanceof Error) {
+            contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e.message;
+        } else {
+            contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e;
+        }
+    } finally {
+        this.innerHTML = prevElementHTML;
     }
 }
 

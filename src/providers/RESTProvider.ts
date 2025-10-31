@@ -75,6 +75,18 @@ export default class RESTProvider extends Provider {
     public fixSpelling(content: string) {
         return this.streamGenerator(this.getFixSpellingPrompt(content));
     }
+
+    public proofRead(content: string) {
+        return this.streamGenerator(this.getProofReadPrompt(content));
+    }
+
+    public summarize(content: string) {
+        return this.streamGenerator(this.getSummarizePrompt(content));
+    }
+
+    public explain(content: string) {
+        return this.streamGenerator(this.getExplainPrompt(content));
+    }
 }
 
 interface StreamResponse {
