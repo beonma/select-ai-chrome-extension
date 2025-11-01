@@ -43,7 +43,8 @@
     align-items: center;
 }
 
-.toolbar .rephrase-bar {
+.toolbar .rephrase-bar,
+.toolbar .summarize-bar {
     display: none;
     padding: 4px;
     gap: 2px;
@@ -74,7 +75,8 @@
     border-width: 0px !important;
 }
 
-.toolbar .rephrase-bar .btn {
+.toolbar .rephrase-bar .btn,
+.toolbar .summarize-bar .btn {
     padding: 13px 8px !important;
 }
 

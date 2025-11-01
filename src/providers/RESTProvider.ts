@@ -80,8 +80,8 @@ export default class RESTProvider extends Provider {
         return this.streamGenerator(this.getProofReadPrompt(content));
     }
 
-    public summarize(content: string) {
-        return this.streamGenerator(this.getSummarizePrompt(content));
+    public summarize(content: string, headline: boolean) {
+        return this.streamGenerator(this.getSummarizePrompt(content, headline));
     }
 
     public explain(content: string) {

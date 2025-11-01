@@ -34,6 +34,8 @@ const rephraseTones = [
     "sympathetic",
 ];
 
+const summarizeType = ["default", "headline"];
+
 const buttons = ["accept", "discard"];
 
 const port = chrome.runtime.connect({ name: "CredentialPort" });
@@ -50,7 +52,7 @@ const html = `
 <div class="${styles.container}">
     <div class="${styles.toolbar}">
         <div class="${styles["top-bar"]}">
-            <button class="${styles.btn}">rephrase
+            <button class="${styles.btn}">rewrite
                 ${RephraseSVG}
             </button>
             <button class="${styles.btn}">proof read
@@ -65,8 +67,12 @@ const html = `
             <button class="${styles.btn}">explain
                 ${ExplainSVG}
             </button>
-        </div><div class="${styles["rephrase-bar"]}">
+        </div>
+        <div class="${styles["rephrase-bar"]}">
             ${rephraseTones.map(tone => '<button class="' + styles.btn + '">' + tone + "</button>").join("")}
+        </div>
+        <div class="${styles["summarize-bar"]}">
+            ${summarizeType.map(type => '<button class="' + styles.btn + '">' + type + "</button>").join("")}
         </div>
     </div>
     <div class="${styles.content}">
@@ -86,12 +92,17 @@ document.querySelector("body")?.insertAdjacentHTML("afterbegin", html);
 const htmlNode = <HTMLElement>document.querySelector(`.${styles.container}`);
 const topToolbar = <HTMLDivElement>htmlNode.querySelector(`.${styles.toolbar} .${styles["top-bar"]}`);
 const rephraseToolbar = <HTMLDivElement>htmlNode.querySelector(`.${styles.toolbar} .${styles["rephrase-bar"]}`);
+const summarizeToolbar = <HTMLDivElement>htmlNode.querySelector(`.${styles.toolbar} .${styles["summarize-bar"]}`);
 
 const editableElements: NodeListOf<HTMLTextAreaElement | HTMLInputElement> =
     document.querySelectorAll("input, textarea");
 
 const rephraseSubBtns = <NodeListOf<HTMLButtonElement>>(
     htmlNode.querySelectorAll(`.${styles.toolbar} .${styles["rephrase-bar"]} button`)
+);
+
+const summarizeSubBtns = <NodeListOf<HTMLButtonElement>>(
+    htmlNode.querySelectorAll(`.${styles.toolbar} .${styles["summarize-bar"]} button`)
 );
 
 const rephraseBtn = <HTMLButtonElement>(
@@ -180,11 +191,15 @@ document.addEventListener("selectionchange", () => {
 rephraseBtn.addEventListener("click", onRephraseClick);
 proofReadBtn.addEventListener("click", generateProofRead);
 fixSpellingBtn.addEventListener("click", generateFixSpelling);
-summarizeBtn.addEventListener("click", generateSummarize);
+summarizeBtn.addEventListener("click", onSummarizeClick);
 explainBtn.addEventListener("click", generateExplain);
 
 rephraseSubBtns.forEach(el => {
     el.addEventListener("click", generateRephrase);
+});
+
+summarizeSubBtns.forEach(el => {
+    el.addEventListener("click", generateSummarize);
 });
 
 acceptButton.addEventListener("click", () => {
@@ -214,6 +229,11 @@ copyButton.addEventListener("click", async () => {
 function onRephraseClick() {
     topToolbar.style.display = "none";
     rephraseToolbar.style.display = "flex";
+}
+
+function onSummarizeClick() {
+    topToolbar.style.display = "none";
+    summarizeToolbar.style.display = "flex";
 }
 
 async function generateRephrase(this: HTMLButtonElement) {
@@ -317,7 +337,9 @@ async function generateProofRead(this: HTMLButtonElement) {
 
 async function generateSummarize(this: HTMLButtonElement) {
     const prevElementHTML = this.innerHTML;
+    const type = this.textContent;
 
+    this.style.setProperty("padding", "6px 8px", "important");
     this.innerHTML = LoadingSVG;
     content.style.display = "block";
     contentParagraph.innerHTML = "";
@@ -327,7 +349,7 @@ async function generateSummarize(this: HTMLButtonElement) {
             throw new Error("couldn't initialize a provider.");
         }
 
-        const result = provider.explain(selectionRef.text);
+        const result = provider.summarize(selectionRef.text, type === "headline");
 
         for await (const chunk of result) {
             const spanElement = document.createElement("span");
@@ -343,6 +365,7 @@ async function generateSummarize(this: HTMLButtonElement) {
             contentParagraph.innerHTML = "Oops ! something went wrong.<br>" + e;
         }
     } finally {
+        this.style.setProperty("padding", "13px 8px", "important");
         this.innerHTML = prevElementHTML;
     }
 }
@@ -383,6 +406,7 @@ function hideToolbar() {
     htmlNode.style.display = "none";
     topToolbar.style.display = "flex";
     rephraseToolbar.style.display = "none";
+    summarizeToolbar.style.display = "none";
     content.style.display = "none";
     contentParagraph.innerHTML = "";
 }

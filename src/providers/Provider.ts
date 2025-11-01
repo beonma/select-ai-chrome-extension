@@ -11,7 +11,11 @@ export default abstract class Provider {
         return `<text>${content}</text>\n\n<instructions>- proofread text for grammar, spelling, punctuation, clarity, and conciseness.\n- output should keep the same meaning, tone, and intent\n- output should be as close as possible to text length\n- the output should be the result only\n- output should be in plain text</instructions>`;
     }
 
-    protected getSummarizePrompt(content: string) {
+    protected getSummarizePrompt(content: string, headline: boolean = false) {
+        if (headline) {
+            return `<text>${content}</text>\n\n<instructions>- Generate a clear, comprehensive headline for text.\n- output headline should be at max 12 words.\n- the output should be the result only\n- output should be in plain text</instructions>`;
+        }
+
         return `<text>${content}</text>\n\n<instructions>- Summarize text, focusing on the main ideas and key details.\n- the output should be the result only\n- output should be in plain text</instructions>`;
     }
 
@@ -22,6 +26,6 @@ export default abstract class Provider {
     public abstract rephrase(content: string, tone: string): AsyncGenerator<string>;
     public abstract fixSpelling(content: string): AsyncGenerator<string>;
     public abstract proofRead(content: string): AsyncGenerator<string>;
-    public abstract summarize(content: string): AsyncGenerator<string>;
+    public abstract summarize(content: string, headline: boolean): AsyncGenerator<string>;
     public abstract explain(content: string): AsyncGenerator<string>;
 }
