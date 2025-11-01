@@ -48,7 +48,7 @@ export default class GeminiNano extends Provider {
         }
     }
 
-    private async *summarizeStreamGenerator(prompt: string) {
+    private async *summarizeStreamGenerator(prompt: string, headline: boolean = false) {
         if (window.Summarizer === undefined || (await window.Summarizer?.availability()) !== "available") {
             throw new Error("summarizer model not available.");
         }
@@ -56,8 +56,10 @@ export default class GeminiNano extends Provider {
         const session = await window.Summarizer.create({
             length: "medium",
             format: "plain-text",
-            type: "tldr",
+            type: headline ? "headline" : "tldr",
             expectedContextLanguages: ["en"],
+            expectedInputLanguages: ["en"],
+            outputLanguage: "en",
         });
 
         const stream = session.summarizeStreaming(prompt);
@@ -68,7 +70,12 @@ export default class GeminiNano extends Provider {
     }
 
     public rephrase(content: string, tone: string) {
-        return this.promptStreamGenerator(this.getRephrasePrompt(content, tone));
+        return this.rewriteStreamGenerator(
+            content,
+            "You are a rewriting assistant that rewrites text in a " +
+                tone +
+                " tone while preserving its original meaning and key details.",
+        );
     }
 
     public fixSpelling(content: string) {
@@ -79,8 +86,8 @@ export default class GeminiNano extends Provider {
         return this.rewriteStreamGenerator(content, "proofread text for grammar, spelling, punctuation and clarity.");
     }
 
-    public summarize(content: string) {
-        return this.summarizeStreamGenerator(this.getSummarizePrompt(content));
+    public summarize(content: string, headline: boolean) {
+        return this.summarizeStreamGenerator(content, headline);
     }
 
     public explain(content: string) {
