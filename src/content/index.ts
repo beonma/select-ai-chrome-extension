@@ -250,7 +250,8 @@ async function generateRephrase(this: HTMLButtonElement) {
             throw new Error("couldn't initialize a provider.");
         }
 
-        const result = provider.rephrase(selectionRef.text, tone);
+        //INFO typescript complaining about tone possibly being null, knowing this.textContent will always yield a string
+        const result = provider.rephrase(selectionRef.text, tone!);
 
         for await (const chunk of result) {
             const spanElement = document.createElement("span");
