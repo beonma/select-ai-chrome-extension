@@ -404,7 +404,7 @@ async function generateExplain(this: HTMLButtonElement) {
 }
 
 function hideToolbar() {
-    htmlNode.style.display = "none";
+    htmlNode.classList.remove(styles.visible);
     topToolbar.style.display = "flex";
     rephraseToolbar.style.display = "none";
     summarizeToolbar.style.display = "none";
@@ -415,7 +415,7 @@ function hideToolbar() {
 function showToolbar(rect: DOMRect) {
     const { bottom: offsetY, left: offsetX } = rect;
 
-    htmlNode.style.display = "block";
+    htmlNode.classList.add(styles.visible);
     htmlNode.style.top = `${offsetY + window.scrollY + 10}px`;
     htmlNode.style.left = `${offsetX}px`;
 }
