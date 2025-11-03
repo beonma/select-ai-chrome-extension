@@ -228,12 +228,12 @@ copyButton.addEventListener("click", async () => {
 
 function onRephraseClick() {
     topToolbar.style.display = "none";
-    rephraseToolbar.style.display = "flex";
+    rephraseToolbar.classList.add(styles.visible);
 }
 
 function onSummarizeClick() {
     topToolbar.style.display = "none";
-    summarizeToolbar.style.display = "flex";
+    summarizeToolbar.classList.add(styles.visible);
 }
 
 async function generateRephrase(this: HTMLButtonElement) {
@@ -405,11 +405,14 @@ async function generateExplain(this: HTMLButtonElement) {
 
 function hideToolbar() {
     htmlNode.classList.remove(styles.visible);
-    topToolbar.style.display = "flex";
-    rephraseToolbar.style.display = "none";
-    summarizeToolbar.style.display = "none";
-    content.style.display = "none";
-    contentParagraph.innerHTML = "";
+    rephraseToolbar.classList.remove(styles.visible);
+    summarizeToolbar.classList.remove(styles.visible);
+
+    setTimeout(() => {
+        topToolbar.style.display = "flex";
+        content.style.display = "none";
+        contentParagraph.innerHTML = "";
+    }, 500);
 }
 
 function showToolbar(rect: DOMRect) {

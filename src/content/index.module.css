@@ -32,32 +32,44 @@
     }
 }
 
-@starting-style {
-    .container.visible {
-        opacity: 0;
-        transform: translateY(50px);
-    }
+.toolbar > *,
+.toolbar > *:hover,
+.toolbar > *:focus {
+    border: 0;
+}
+
+.toolbar > div {
+    padding: 4px;
+    gap: 2px;
+    align-items: center;
 }
 
 .toolbar .top-bar {
     display: flex;
-    padding: 4px;
-    gap: 2px;
-    align-items: center;
 }
 
 .toolbar .rephrase-bar,
 .toolbar .summarize-bar {
     display: none;
-    padding: 4px;
-    gap: 2px;
-    align-items: center;
+    opacity: 0;
+    transition: opacity 500ms ease, display 500ms ease allow-discrete;
+
+    &.visible {
+        opacity: 1;
+        display: flex;
+    }
 }
 
-.toolbar > *,
-.toolbar > *:hover,
-.toolbar > *:focus {
-    border: 0;
+@starting-style {
+    .container.visible {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    .toolbar .rephrase-bar.visible,
+    .toolbar .summarize-bar.visible {
+        opacity: 0;
+    }
 }
 
 .btn {
