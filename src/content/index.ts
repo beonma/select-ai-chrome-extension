@@ -68,10 +68,10 @@ const html = `
                 ${ExplainSVG}
             </button>
         </div>
-        <div class="${styles["rephrase-bar"]}">
+        <div toolbar class="${styles["rephrase-bar"]}">
             ${rephraseTones.map(tone => '<button class="' + styles.btn + '">' + tone + "</button>").join("")}
         </div>
-        <div class="${styles["summarize-bar"]}">
+        <div toolbar class="${styles["summarize-bar"]}">
             ${summarizeType.map(type => '<button class="' + styles.btn + '">' + type + "</button>").join("")}
         </div>
     </div>

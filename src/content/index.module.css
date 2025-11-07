@@ -24,6 +24,7 @@
     opacity: 0;
     transform: translateY(50px);
     transition: opacity 250ms ease, transform 250ms ease, display 250ms ease allow-discrete;
+    overflow-x: hidden;
 
     &.visible {
         display: block;
@@ -38,10 +39,11 @@
     border: 0;
 }
 
-.toolbar > div {
+.toolbar > div[toolbar] {
     padding: 4px;
     gap: 2px;
     align-items: center;
+    width: 485px;
 }
 
 .toolbar .top-bar {
@@ -50,13 +52,60 @@
 
 .toolbar .rephrase-bar,
 .toolbar .summarize-bar {
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
     display: none;
     opacity: 0;
     transition: opacity 500ms ease, display 500ms ease allow-discrete;
+    anchor-name: --toolbar;
 
     &.visible {
         opacity: 1;
         display: flex;
+    }
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    &::scroll-button(left) {
+        content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 -1 24 24'%3E%3Cpath fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='m14 7l-5 5m0 0l5 5'/%3E%3C/svg%3E") /
+            "Scroll Left";
+        position-area: left center;
+        margin-right: -32px;
+    }
+
+    &::scroll-button(right) {
+        content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 -1 24 24'%3E%3Cpath fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='m10 17l5-5m0 0l-5-5'/%3E%3C/svg%3E") /
+            "Scroll Right";
+        position-area: right center;
+        margin-left: -32px;
+    }
+
+    &::scroll-button(*) {
+        position-anchor: --toolbar;
+        position: absolute;
+        padding: 0;
+        background-color: var(--accent-color);
+        height: 30px;
+        width: 30px;
+        opacity: 1;
+        border-radius: 50%;
+        border: none;
+        transition: opacity 250ms ease;
+        cursor: pointer;
+    }
+
+    &::scroll-button(*):disabled {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    button {
+        scroll-snap-align: center;
+        flex-shrink: 0;
     }
 }
 
@@ -68,6 +117,10 @@
 
     .toolbar .rephrase-bar.visible,
     .toolbar .summarize-bar.visible {
+        opacity: 0;
+    }
+
+    .toolbar > div[toolbar]::scroll-button(*) {
         opacity: 0;
     }
 }
