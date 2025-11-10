@@ -208,6 +208,17 @@ acceptButton.addEventListener("click", () => {
     if (parentElement instanceof HTMLInputElement || parentElement instanceof HTMLTextAreaElement) {
         const newContent = getNewContent(parentElement.value);
         parentElement.value = newContent;
+
+        const event = new InputEvent("input", { bubbles: true });
+        parentElement.dispatchEvent(event);
+    }
+
+    if (parentElement.getAttribute("contenteditable") === "true" && parentElement.textContent) {
+        const newContent = getNewContent(parentElement.textContent);
+        parentElement.textContent = newContent;
+
+        const event = new InputEvent("input", { bubbles: true });
+        parentElement.dispatchEvent(event);
     }
 
     if (parentElement instanceof HTMLElement && parentElement.textContent) {
