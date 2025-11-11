@@ -13,18 +13,28 @@ export default class RESTProvider extends Provider {
         this.ENDPOINT = payload.endpoint;
     }
 
-    private async *streamGenerator(prompt: string): AsyncGenerator<string> {
+    private async *streamGenerator({
+        systemPrompt,
+        userPrompt,
+        temperature = 0.8,
+    }: StreamGeneratorPayload): AsyncGenerator<string> {
+        const requestBody: CompletionRequestBody = {
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt },
+            ],
+            model: this.MODEL,
+            stream: true,
+            temperature: temperature,
+        };
+
         const response = await fetch(this.ENDPOINT + "/chat/completions", {
             method: "POST",
             headers: {
                 Authorization: "Bearer " + this.API_KEY,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                messages: [{ role: "user", content: prompt }],
-                model: this.MODEL,
-                stream: true,
-            }),
+            body: JSON.stringify(requestBody),
         });
 
         if (!response.ok) {
@@ -89,7 +99,13 @@ export default class RESTProvider extends Provider {
     }
 }
 
-interface StreamResponse {
+type StreamGeneratorPayload = {
+    systemPrompt: string;
+    userPrompt: string;
+    temperature?: number;
+};
+
+type StreamResponse = {
     choices: {
         delta: {
             content?: string;
@@ -101,7 +117,23 @@ interface StreamResponse {
     id: string;
     model: string;
     object: "chat.completion.chunk";
-}
+};
+
+type CompletionRequestBody = {
+    messages: {
+        content: string;
+        role: "system" | "user" | "assistant";
+    }[];
+    model: string;
+    max_tokens?: number;
+    frequency_penalty?: number;
+    presence_penalty?: number;
+    stop?: null | string[];
+    stream?: boolean;
+    stream_options?: { include_usage: boolean };
+    temperature?: number;
+    top_p?: number;
+};
 
 type GroqErrorObject = {
     error: {

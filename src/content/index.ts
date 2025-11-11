@@ -327,7 +327,7 @@ async function generateProofRead(this: HTMLButtonElement) {
             throw new Error("couldn't initialize a provider.");
         }
 
-        const result = provider.explain(selectionRef.text);
+        const result = provider.proofRead(selectionRef.text);
 
         for await (const chunk of result) {
             const spanElement = document.createElement("span");
