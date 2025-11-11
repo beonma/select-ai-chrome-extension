@@ -27,7 +27,7 @@ export default abstract class Provider {
         };
     }
 
-    protected getSummarizePrompt(content: string, headline: boolean = false) {
+    protected getSummarizePrompt(content: string, type: string) {
         const payload = {
             systemPrompt:
                 "You are an expert summarizer. Your task is to produce clear and concise summaries that retain the main ideas and tone of the original text.\n\nFollow these rules:\nOutput should be in plain text.\nDo not use markdown.",
@@ -35,10 +35,27 @@ export default abstract class Provider {
             temperature: 0.3,
         };
 
-        if (headline) {
-            payload.systemPrompt =
-                "You are a creative copywriter who generates a single, clear, and engaging headline based on the user's text.\n\nFollow these rules:\nGenerate only one headline.\nHeadline should be in plain text.\nOutput headline should be at max 12 words.\nOutput should be the headline only.";
-            payload.temperature = 0.8;
+        switch (type) {
+            case "headline":
+                payload.systemPrompt =
+                    "You are a creative copywriter who generates a single, clear, and engaging headline based on the user's text.\n\nFollow these rules:\nGenerate only one headline.\nHeadline should be in plain text.\nOutput headline should be at max 12 words.\nOutput should be the headline only.";
+                payload.temperature = 0.8;
+                break;
+
+            case "short":
+                payload.systemPrompt =
+                    "You are a summarization assistant. Summarize the provided text in about three sentences, focusing only on the central ideas or conclusions. Exclude examples, elaborations, and minor details.";
+                break;
+
+            case "medium":
+                payload.systemPrompt =
+                    "You are a summarization assistant. Summarize the provided text in about six sentences, capturing the main ideas and key supporting details. The summary should be clear, coherent, and moderately condensed without losing important context.";
+                break;
+
+            case "long":
+                payload.systemPrompt =
+                    "You are a summarization assistant. Summarize the provided text in about twelve sentences, preserving all major points, arguments, and examples. The summary should provide a thorough understanding of the content while remaining concise and well-structured.";
+                break;
         }
 
         return payload;
@@ -56,6 +73,6 @@ export default abstract class Provider {
     public abstract rephrase(content: string, tone: string): AsyncGenerator<string>;
     public abstract fixSpelling(content: string): AsyncGenerator<string>;
     public abstract proofRead(content: string): AsyncGenerator<string>;
-    public abstract summarize(content: string, headline: boolean): AsyncGenerator<string>;
+    public abstract summarize(content: string, type: string): AsyncGenerator<string>;
     public abstract explain(content: string): AsyncGenerator<string>;
 }

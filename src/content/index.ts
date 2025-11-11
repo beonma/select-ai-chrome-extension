@@ -1,12 +1,12 @@
 import * as styles from "./index.module.css";
-import RephraseSVG from "../assets/svg/rephrase.svg";
-import SpellingSVG from "../assets/svg/spelling.svg";
-import LoadingSVG from "../assets/svg/loading.svg";
-import CopySVG from "../assets/svg/copy.svg";
-import CheckSVG from "../assets/svg/check.svg";
-import SummarizeSVG from "../assets/svg/summarize.svg";
-import ExplainSVG from "../assets/svg/explain.svg";
-import type { EditableElement, SessionCredentialType } from "src/types";
+import RephraseSVG from "@src/assets/svg/rephrase.svg";
+import SpellingSVG from "@src/assets/svg/spelling.svg";
+import LoadingSVG from "@src/assets/svg/loading.svg";
+import CopySVG from "@src/assets/svg/copy.svg";
+import CheckSVG from "@src/assets/svg/check.svg";
+import SummarizeSVG from "@src/assets/svg/summarize.svg";
+import ExplainSVG from "@src/assets/svg/explain.svg";
+import type { EditableElement, SessionCredentialType } from "@src/types";
 import Provider from "@src/providers/Provider";
 import getProvider from "@src/providers/getProvider";
 
@@ -34,7 +34,15 @@ const rephraseTones = [
     "sympathetic",
 ];
 
-const summarizeType = ["default", "headline"];
+const summarizeType = ["short", "long", "medium", "headline"];
+
+const topBarButtons = [
+    { name: "rewrite", svg: RephraseSVG },
+    { name: "proof read", svg: CheckSVG },
+    { name: "fix spelling", svg: SpellingSVG },
+    { name: "summarize", svg: SummarizeSVG },
+    { name: "explain", svg: ExplainSVG },
+];
 
 const buttons = ["accept", "discard"];
 
@@ -51,22 +59,10 @@ port.onMessage.addListener((message: SessionCredentialType | undefined) => {
 const html = `
 <div class="${styles.container}">
     <div class="${styles.toolbar}">
-        <div class="${styles["top-bar"]}">
-            <button class="${styles.btn}">rewrite
-                ${RephraseSVG}
-            </button>
-            <button class="${styles.btn}">proof read
-                ${CheckSVG}
-            </button>
-            <button class="${styles.btn}">fix spelling
-                ${SpellingSVG}
-            </button>
-            <button class="${styles.btn}">summarize
-                ${SummarizeSVG}
-            </button>
-            <button class="${styles.btn}">explain
-                ${ExplainSVG}
-            </button>
+        <div toolbar class="${styles["top-bar"]}">
+            ${topBarButtons
+                .map(btn => '<button class="' + styles.btn + '">' + btn.name + btn.svg + "</button>")
+                .join("")}
         </div>
         <div toolbar class="${styles["rephrase-bar"]}">
             ${rephraseTones.map(tone => '<button class="' + styles.btn + '">' + tone + "</button>").join("")}
@@ -349,7 +345,7 @@ async function generateProofRead(this: HTMLButtonElement) {
 
 async function generateSummarize(this: HTMLButtonElement) {
     const prevElementHTML = this.innerHTML;
-    const type = this.textContent;
+    const type = this.textContent as string;
 
     this.style.setProperty("padding", "6px 8px", "important");
     this.innerHTML = LoadingSVG;
@@ -361,7 +357,7 @@ async function generateSummarize(this: HTMLButtonElement) {
             throw new Error("couldn't initialize a provider.");
         }
 
-        const result = provider.summarize(selectionRef.text, type === "headline");
+        const result = provider.summarize(selectionRef.text, type);
 
         for await (const chunk of result) {
             const spanElement = document.createElement("span");
