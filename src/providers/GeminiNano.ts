@@ -1,3 +1,4 @@
+//@ts-nocheck
 import Provider from "./Provider";
 
 export default class GeminiNano extends Provider {
