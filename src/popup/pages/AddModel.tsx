@@ -58,7 +58,7 @@ const AddModel = (_props: Props): React.JSX.Element => {
             if (formData.provider === "gemini-nano") {
                 delete formData.apiKey;
                 formData.name = "Gemini Nano";
-                formData.model = "build-in browser AI";
+                formData.model = "built-in browser AI";
 
                 const checkAvailability = await Promise.all(
                     GEMINI_NANO_MODELS.map(model => window[model.objectKey]?.availability()),
@@ -176,40 +176,6 @@ const AddModel = (_props: Props): React.JSX.Element => {
                     {/* TODO add test connection */}
                     {/* {<Button variant="outline">Test connection</Button>} */}
                 </div>
-                {formState.provider !== "gemini-nano" ? (
-                    <React.Fragment>
-                        <InputField
-                            label="name"
-                            value={formState.name}
-                            onChange={e => {
-                                setFormState(prev => ({ ...prev, name: e.target.value }));
-                            }}
-                            placeholder="give it a name"
-                            type="text"
-                        />
-                        <InputField
-                            label="API key"
-                            value={formState.apiKey}
-                            onChange={e => {
-                                setFormState(prev => ({ ...prev, apiKey: e.target.value }));
-                            }}
-                            placeholder="your api key here"
-                            type="password"
-                        />
-                        <div className="flex gap-2">
-                            <Button disabled={isSubmitting} onClick={onFormSubmitHandler}>
-                                save
-                            </Button>
-                            {/* TODO add test connection */}
-                            {/* {<Button variant="outline">Test connection</Button>} */}
-                        </div>
-                    </React.Fragment>
-                ) : (
-                    <p>
-                        <strong>Gemini Nano</strong> will be available soon !<br></br> it's currently limited to our{" "}
-                        <strong>beta</strong> release.
-                    </p>
-                )}
             </div>
         </React.Fragment>
     );
