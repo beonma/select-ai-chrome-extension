@@ -8,7 +8,7 @@
         "build": "webpack --config webpack.prod.cjs && npm run zip",
         "zip": "cd dist && zip -r ../dist.zip .",
         "lint": "eslint .",
-        "postversion": "PACKAGE_VERSION=$(jq -r '.version' package.json) && echo $(jq --arg VERSION $PACKAGE_VERSION '.version=$VERSION' static/manifest.json) > static/manifest.json && git add static/manifest.json && git commit --amend --no-edit"
+        "version": "PACKAGE_VERSION=$(jq -r '.version' package.json) && echo $(jq --arg VERSION $PACKAGE_VERSION '.version=$VERSION' static/manifest.json) > static/manifest.json && git add static/manifest.json"
     },
     "keywords": [
         "chrome",
