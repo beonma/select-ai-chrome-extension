@@ -1,11 +1,12 @@
 import Provider from "./Provider";
+import type { StreamGeneratorPayload } from "./RESTProvider";
 
 export default class GeminiNano extends Provider {
     constructor() {
         super();
     }
 
-    private async *promptStreamGenerator(prompt: string) {
+    private async *promptStreamGenerator(payload: StreamGeneratorPayload) {
         if (window.LanguageModel === undefined || (await window.LanguageModel?.availability()) !== "available") {
             throw new Error("language model not available.");
         }
@@ -13,17 +14,20 @@ export default class GeminiNano extends Provider {
         const expectedLanguage: { type: "text"; languages: string[] }[] = [{ type: "text", languages: ["en"] }];
 
         const session = await window.LanguageModel.create({
+            initialPrompts: [{ role: "system", content: payload.systemPrompt }],
             expectedInputs: expectedLanguage,
             expectedOutputs: expectedLanguage,
-            temperature: 0.5,
+            temperature: payload.temperature ?? 0.5,
             topK: 40,
         });
 
-        const stream = session.promptStreaming(prompt);
+        const stream = session.promptStreaming(payload.userPrompt);
 
         for await (const chunk of stream) {
             yield chunk;
         }
+
+        session.destroy();
     }
 
     private async *rewriteStreamGenerator(prompt: string, context?: string) {
@@ -48,15 +52,15 @@ export default class GeminiNano extends Provider {
         }
     }
 
-    private async *summarizeStreamGenerator(prompt: string, headline: boolean = false) {
+    private async *summarizeStreamGenerator(prompt: string, type: string) {
         if (window.Summarizer === undefined || (await window.Summarizer?.availability()) !== "available") {
             throw new Error("summarizer model not available.");
         }
 
         const session = await window.Summarizer.create({
-            length: "medium",
+            length: type === "headline" ? "medium" : (type as "medium" | "short" | "long"),
             format: "plain-text",
-            type: headline ? "headline" : "tldr",
+            type: type === "headline" ? "headline" : "tldr",
             expectedContextLanguages: ["en"],
             expectedInputLanguages: ["en"],
             outputLanguage: "en",
@@ -86,8 +90,8 @@ export default class GeminiNano extends Provider {
         return this.rewriteStreamGenerator(content, "proofread text for grammar, spelling, punctuation and clarity.");
     }
 
-    public summarize(content: string, headline: boolean) {
-        return this.summarizeStreamGenerator(content, headline);
+    public summarize(content: string, type: string) {
+        return this.summarizeStreamGenerator(content, type);
     }
 
     public explain(content: string) {
