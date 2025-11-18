@@ -35,5 +35,5 @@ module.exports = merge(common, {
             },
         ],
     },
-    plugins: [new Dotenv({ safe: false, path: "./.env.prod" })],
+    plugins: [new Dotenv({ safe: "./.env.example", path: "./.env.prod" })],
 });
