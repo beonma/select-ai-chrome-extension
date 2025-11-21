@@ -99,7 +99,7 @@ export default class RESTProvider extends Provider {
     }
 }
 
-type StreamGeneratorPayload = {
+export type StreamGeneratorPayload = {
     systemPrompt: string;
     userPrompt: string;
     temperature?: number;

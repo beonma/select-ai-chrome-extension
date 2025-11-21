@@ -1,4 +1,4 @@
-import { Credential } from "@src/types";
+import { Credential, SessionCredentialType } from "@src/types";
 import { decryptRequest } from "@src/utils/encryption";
 import { getAllCredentials, getSessionCredential, setSessionCredential } from "@src/utils/storage";
 
@@ -73,13 +73,21 @@ async function updateSessionCredential(credentials: Credential[]) {
         return;
     }
 
+    if (!defaultCredential.apiKey) {
+        await setSessionCredential({
+            providerName: defaultCredential.provider,
+            model: defaultCredential.model,
+        });
+        return;
+    }
+
     const {
         apiKey: { encryptedData, iv },
     } = defaultCredential;
 
     const decryptedApiKey = await decryptRequest({ encryptedData, iv });
 
-    await setSessionCredential({
+    await setSessionCredential<SessionCredentialType>({
         apiKey: decryptedApiKey,
         providerName: defaultCredential.provider,
         model: defaultCredential.model,
