@@ -1,3 +1,12 @@
+import TRIAL_TOKENS from "@src/trial_tokens.json";
+
+TRIAL_TOKENS.forEach(obj => {
+    const otMeta = document.createElement("meta");
+    otMeta.httpEquiv = "origin-trial";
+    otMeta.content = obj.token;
+    document.head.append(otMeta);
+});
+
 import * as styles from "./index.module.css";
 import RephraseSVG from "@src/assets/svg/rephrase.svg";
 import SpellingSVG from "@src/assets/svg/spelling.svg";
