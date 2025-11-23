@@ -32,17 +32,7 @@ npm ci
 WORKER_URL=https://select-ai-worker.beonma.workers.dev
 ```
 
-### 4. Optional: Switch to Gemini Nano build
-
-If you want to test the **Gemini Nano** version (still under development):
-
-```bash
-git switch feat/gemininano
-```
-
-Skip this step to use the standard build.
-
-### 5. Build the extension
+### 4. Build the extension
 
 Ensure Node.js version matches **v18.19.1** for best **compatibility**.
 
@@ -50,7 +40,7 @@ Ensure Node.js version matches **v18.19.1** for best **compatibility**.
 npm run build
 ```
 
-### 6. Load the extension in Chrome
+### 5. Load the extension in Chrome
 
 -   Open Chrome and go to `chrome://extensions`.
 
