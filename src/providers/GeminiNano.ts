@@ -8,7 +8,9 @@ export default class GeminiNano extends Provider {
 
     private async *promptStreamGenerator(payload: StreamGeneratorPayload) {
         if (window.LanguageModel === undefined || (await window.LanguageModel?.availability()) !== "available") {
-            throw new Error("language model not available.");
+            throw new Error(
+                "language model not available. Make sure you have the Prompt API for Gemini Nano flag enabled under the chrome flags and refresh.",
+            );
         }
 
         const expectedLanguage: { type: "text"; languages: string[] }[] = [{ type: "text", languages: ["en"] }];
@@ -32,7 +34,9 @@ export default class GeminiNano extends Provider {
 
     private async *rewriteStreamGenerator(prompt: string, context?: string) {
         if (window.Rewriter === undefined || (await window.Rewriter?.availability()) !== "available") {
-            throw new Error("rewriter model not available.");
+            throw new Error(
+                "rewriter model not available. Make sure you have the Rewriter API for Gemini Nano flag enabled under the chrome flags and refresh.",
+            );
         }
 
         const session = await window.Rewriter.create({
@@ -54,7 +58,9 @@ export default class GeminiNano extends Provider {
 
     private async *summarizeStreamGenerator(prompt: string, type: string) {
         if (window.Summarizer === undefined || (await window.Summarizer?.availability()) !== "available") {
-            throw new Error("summarizer model not available.");
+            throw new Error(
+                "summarizer model not available. Make sure you have the Summarizer API for Gemini Nano flag enabled under the chrome flags and refresh.",
+            );
         }
 
         const session = await window.Summarizer.create({

@@ -11,9 +11,19 @@ export const GEMINI_NANO_MODELS = [
 
 export default function (): JSX.Element {
     return (
-        <div className="flex flex-wrap gap-4">
-            <p className="text-red-600">
-                Note that this feature is experimental, may be unstable, and could be removed in the future.
+        <div className="flex flex-wrap gap-4 justify-start">
+            <p>
+                Ensure the required flags{" "}
+                <code className="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded">
+                    Prompt API for Gemini Nano
+                </code>{" "}
+                and{" "}
+                <code className="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded">
+                    Rewriter API for Gemini Nano
+                </code>{" "}
+                are enabled before proceeding. You can activate them by visiting{" "}
+                <code className="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded">chrome://flags</code>. This
+                feature is experimental, may be unstable, and could be removed at any time.
             </p>
             {GEMINI_NANO_MODELS.map(model => (
                 <ModelBadge key={model.objectKey} model={model} />

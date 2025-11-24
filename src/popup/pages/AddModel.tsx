@@ -12,6 +12,7 @@ import { encryptRequest } from "@src/utils/encryption";
 import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import GeminiNano, { GEMINI_NANO_MODELS } from "@/components/AddModel/GeminiNano";
+import Download from "@/assets/svg/Download";
 
 type Props = {
     children?: React.ReactNode;
@@ -34,6 +35,48 @@ const AddModel = (_props: Props): React.JSX.Element => {
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [downloadText, setDownloadText] = useState<string>("Download");
+
+    async function onDownloadClick() {
+        // TODO to be refactored
+        try {
+            const checkAvailability = await Promise.all(
+                GEMINI_NANO_MODELS.map(model => window[model.objectKey]?.availability()),
+            );
+
+            if (checkAvailability.some(el => el !== "downloadable")) {
+                throw new Error("You must have all required models available for download before proceeding.");
+            }
+
+            toast({
+                title: "Downloading...",
+                description:
+                    "Please make sure not to leave the page before the download finishes. Thank you for your patience.",
+            });
+
+            await window.LanguageModel?.create({
+                //@ts-ignore
+                monitor(m) {
+                    m.addEventListener("downloadprogress", (e: any) => {
+                        setDownloadText(Number((e.loaded * 100).toFixed(1)) + "%");
+                    });
+                },
+            });
+        } catch (e) {
+            let errorMessage: string = "";
+            if (typeof e === "string") {
+                errorMessage = e;
+            }
+
+            if (e instanceof Error) {
+                errorMessage = e.message;
+            }
+            toast({
+                title: "Error !",
+                description: errorMessage,
+            });
+        }
+    }
 
     function onProviderChangeHandler(value: string) {
         setFormState(prev => ({
@@ -65,7 +108,9 @@ const AddModel = (_props: Props): React.JSX.Element => {
                 );
 
                 if (checkAvailability.some(el => el !== "available")) {
-                    throw new Error("You must have all required models for built-in browser AI before proceeding.");
+                    throw new Error(
+                        "You must have all required models available for built-in browser AI before proceeding.",
+                    );
                 }
 
                 await addCredential(formData as Credential);
@@ -171,8 +216,14 @@ const AddModel = (_props: Props): React.JSX.Element => {
                 {formState.provider === "gemini-nano" && <GeminiNano />}
                 <div className="flex gap-2">
                     <Button disabled={isSubmitting} onClick={onFormSubmitHandler}>
-                        save
+                        Save
                     </Button>
+                    {formState.provider === "gemini-nano" && (
+                        <Button variant="outline" disabled={downloadText !== "Download"} onClick={onDownloadClick}>
+                            {downloadText}
+                            <Download />
+                        </Button>
+                    )}
                     {/* TODO add test connection */}
                     {/* {<Button variant="outline">Test connection</Button>} */}
                 </div>
