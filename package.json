@@ -6,7 +6,7 @@
     "scripts": {
         "start": "webpack --config webpack.dev.cjs",
         "build": "webpack --config webpack.prod.cjs && npm run zip",
-        "zip": "cd dist && zip -r ../dist.zip .",
+        "zip": "cd dist && zip -r ../dist-v$(jq -r '.version' ../package.json)-$(date +%Y%m%d%H%M).zip .",
         "lint": "eslint .",
         "version": "PACKAGE_VERSION=$(jq -r '.version' package.json) && echo $(jq --arg VERSION $PACKAGE_VERSION '.version=$VERSION' static/manifest.json) > static/manifest.json && git add static/manifest.json"
     },
