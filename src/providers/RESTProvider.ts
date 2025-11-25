@@ -18,6 +18,9 @@ export default class RESTProvider extends Provider {
         userPrompt,
         temperature = 0.8,
     }: StreamGeneratorPayload): AsyncGenerator<string> {
+        // TODO enforcing temperature 1 on all openai models since this is the only the api accepts, check if it's only specific to GPT-5.
+        const temp = this.ENDPOINT.match(/https:\/\/api.openai.com\/v1/) ? 1 : temperature;
+
         const requestBody: CompletionRequestBody = {
             messages: [
                 { role: "system", content: systemPrompt },
@@ -25,7 +28,7 @@ export default class RESTProvider extends Provider {
             ],
             model: this.MODEL,
             stream: true,
-            temperature: temperature,
+            temperature: temp,
         };
 
         const response = await fetch(this.ENDPOINT + "/chat/completions", {
