@@ -22,11 +22,11 @@ declare global {
                   }) => Promise<{
                       rewrite: (
                           content: string,
-                          { context, signal }?: { signal?: AbortController; context?: string },
+                          { context, signal }?: { signal?: AbortSignal; context?: string },
                       ) => Promise<string>;
                       rewriteStreaming: (
                           content: string,
-                          { context, signal }?: { signal?: AbortController; context?: string },
+                          { context, signal }?: { signal?: AbortSignal; context?: string },
                       ) => AsyncGenerator<string>;
                       destroy: () => void;
                   }>;
@@ -60,11 +60,11 @@ declare global {
                   }) => Promise<{
                       summarize: (
                           text: string,
-                          { context, signal }?: { context?: string; signal?: AbortController },
+                          { context, signal }?: { context?: string; signal?: AbortSignal },
                       ) => Promise<string>;
                       summarizeStreaming: (
                           text: string,
-                          { context, signal }?: { context?: string; signal?: AbortController },
+                          { context, signal }?: { context?: string; signal?: AbortSignal },
                       ) => AsyncGenerator<string>;
                       destroy: () => void;
                   }>;
@@ -94,7 +94,7 @@ declare global {
                               responseConstraint,
                               omitResponseConstraintInput,
                           }?: {
-                              signal?: AbortController;
+                              signal?: AbortSignal;
                               context?: string;
                               responseConstraint?: Record<string, unknown>;
                               omitResponseConstraintInput?: boolean;
@@ -102,7 +102,7 @@ declare global {
                       ) => Promise<string>;
                       promptStreaming: (
                           content: string,
-                          { context, signal }?: { signal?: AbortController; context?: string },
+                          { context, signal }?: { signal?: AbortSignal; context?: string },
                       ) => AsyncGenerator<string>;
                       destroy: () => void;
                   }>;

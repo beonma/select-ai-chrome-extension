@@ -1,4 +1,22 @@
 export default abstract class Provider {
+    private controller: AbortController;
+
+    constructor() {
+        this.controller = new AbortController();
+    }
+
+    protected getSignal(): AbortSignal {
+        if (this.controller.signal.aborted) {
+            this.controller = new AbortController();
+        }
+
+        return this.controller.signal;
+    }
+
+    public abort(reason?: string) {
+        this.controller.abort(reason);
+    }
+
     protected getRephrasePrompt(content: string, tone: string) {
         return {
             systemPrompt:

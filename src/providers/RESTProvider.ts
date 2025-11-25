@@ -31,6 +31,7 @@ export default class RESTProvider extends Provider {
             temperature: temp,
         };
 
+        const signal = this.getSignal();
         const response = await fetch(this.ENDPOINT + "/chat/completions", {
             method: "POST",
             headers: {
@@ -38,6 +39,7 @@ export default class RESTProvider extends Provider {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(requestBody),
+            signal,
         });
 
         if (!response.ok) {

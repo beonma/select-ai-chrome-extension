@@ -411,6 +411,7 @@ async function generateExplain(this: HTMLButtonElement) {
 }
 
 function hideToolbar() {
+    provider?.abort("hide toolbar");
     htmlNode.classList.remove(styles.visible);
     rephraseToolbar.classList.remove(styles.visible);
     summarizeToolbar.classList.remove(styles.visible);

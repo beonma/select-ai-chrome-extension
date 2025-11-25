@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type { GEMINI_NANO_MODELS } from "./index";
 import type { AvailabilityStatus } from "@src/types";
-import Download from "@/assets/svg/Download";
 
 type Props = {
     model: (typeof GEMINI_NANO_MODELS)[number];

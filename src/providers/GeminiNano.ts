@@ -23,7 +23,8 @@ export default class GeminiNano extends Provider {
             topK: 40,
         });
 
-        const stream = session.promptStreaming(payload.userPrompt);
+        const signal = this.getSignal();
+        const stream = session.promptStreaming(payload.userPrompt, { signal });
 
         for await (const chunk of stream) {
             yield chunk;
@@ -49,7 +50,8 @@ export default class GeminiNano extends Provider {
             sharedContext: context,
         });
 
-        const stream = session.rewriteStreaming(prompt);
+        const signal = this.getSignal();
+        const stream = session.rewriteStreaming(prompt, { signal });
 
         for await (const chunk of stream) {
             yield chunk;
@@ -72,7 +74,8 @@ export default class GeminiNano extends Provider {
             outputLanguage: "en",
         });
 
-        const stream = session.summarizeStreaming(prompt);
+        const signal = this.getSignal();
+        const stream = session.summarizeStreaming(prompt, { signal });
 
         for await (const chunk of stream) {
             yield chunk;
